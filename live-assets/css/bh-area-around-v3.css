@@ -1,0 +1,38 @@
+/* Area activity mosaic: 3-across from tablet up; reset gallery .s4 span-4 full-bleed */
+.around .mosaic,
+.around .bh-area-mosaic {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 6px !important;
+  grid-auto-rows: auto !important;
+}
+@media (min-width: 768px) {
+  .around .mosaic,
+  .around .bh-area-mosaic {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+.around .mosaic > .shot,
+.around .mosaic > .shot.s4,
+.around .mosaic > .shot.s6,
+.around .mosaic > .shot.wide,
+.around .bh-area-mosaic > .shot,
+.around .bh-area-mosaic > .shot.s4,
+.around .bh-area-mosaic > .shot.s6,
+.around .bh-area-mosaic > .shot.wide {
+  position: relative !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 3 / 2 !important;
+}
+.around .mosaic > .shot img,
+.around .bh-area-mosaic > .shot img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}

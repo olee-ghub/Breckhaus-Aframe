@@ -33,3 +33,19 @@
 
 ## Remaining gallery groups
 Exterior; Deck, hot tub & sauna; Living & kitchen; Bedrooms; Baths; The loft; Around the home
+
+## Follow-up: temporary `/__agent` dump routes removed
+
+Worker `breckhaus-basecamp-test` version 208 removed remaining debug/download agent routes:
+
+- `/__agent/send-build-record` (build-record mailer)
+- `/__agent/record/*` (mobile/tablet/desktop HTML dump downloads)
+
+Already removed earlier:
+
+- `/__agent/raw-assets`
+- `/__agent/put-clean-index`
+- `/__agent/get-clean-index`
+- `/__agent/promote-clean-index`
+
+All of the above now return **404**. Main page, static assets, and `/book` booking redirect remain healthy.

@@ -22,7 +22,7 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.2 17h10a3.6 3.6 0 0 0 .25-7.2 4.8 4.8 0 0 0-9.1-1.6A3.9 3.9 0 0 0 7.2 17z"/></svg>';
   }
   function setOpen(on) {
-    if (on) { root.setAttribute("open", ""); btn.setAttribute("aria-expanded", "true"); panel.hidden = false; }
+    if (on) { root.setAttribute("open", ""); btn.setAttribute("aria-expanded", "true"); panel.hidden = false; panel.scrollTop = 0; }
     else { root.removeAttribute("open"); btn.setAttribute("aria-expanded", "false"); panel.hidden = true; }
   }
   btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setOpen(!root.hasAttribute("open")); });

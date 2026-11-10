@@ -185,6 +185,43 @@ const AREA_SCULPTURE_BTN = "<button data-slot=\"around-06-snow-sculpture\" class
 const AREA_TROLL_BTN = "<button data-slot=\"around-07-troll\" class=\"shot s4\" type=\"button\" data-full=\"img/area-troll.jpg?v=area1\" data-cap=\"Isak Heartstone Breckenridge Troll\"><img src=\"img/area-troll.jpg?v=area1\" alt=\"Wooden troll sculpture in the forest near Breckenridge\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_CYCLISTS_BTN = "<button data-slot=\"around-08-cyclists\" class=\"shot s4\" type=\"button\" data-full=\"img/area-cyclists.jpg?v=area1\" data-cap=\"biking\"><img src=\"img/area-cyclists.jpg?v=area1\" alt=\"Four cyclists on a paved mountain trail\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_R2_KEYS = new Set(["img/area-skier.jpg","img/area-snow-sculpture.jpg","img/area-troll.jpg","img/area-cyclists.jpg"]);
+function replaceBalancedOpenTag(html, openRe, replacement) {
+  const m = openRe.exec(html);
+  if (!m) return { html, changed: false };
+  const start = m.index;
+  const openEnd = start + m[0].length;
+  // Determine tag name from match
+  const tagMatch = /^<([a-zA-Z0-9:-]+)/.exec(m[0]);
+  if (!tagMatch) return { html, changed: false };
+  const tag = tagMatch[1].toLowerCase();
+  const lower = html.toLowerCase();
+  let i = openEnd;
+  let depth = 1;
+  while (i < html.length && depth > 0) {
+    const nextOpen = lower.indexOf('<' + tag, i);
+    const nextClose = lower.indexOf('</' + tag, i);
+    if (nextClose < 0) break;
+    if (nextOpen >= 0 && nextOpen < nextClose) {
+      // make sure it's a real open tag not a prefix of another tag
+      const ch = lower[nextOpen + 1 + tag.length];
+      if (ch === '>' || ch === ' ' || ch === '\t' || ch === '\n' || ch === '/') {
+        depth++;
+        i = nextOpen + 1 + tag.length;
+        continue;
+      }
+      i = nextOpen + 1 + tag.length;
+      continue;
+    }
+    depth--;
+    if (depth === 0) {
+      const closeEnd = lower.indexOf('>', nextClose) + 1;
+      return { html: html.slice(0, start) + replacement + html.slice(closeEnd), changed: true };
+    }
+    i = nextClose + 2 + tag.length;
+  }
+  return { html, changed: false };
+}
+
 async function maybeRewriteHtml(request, env, res) {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -489,24 +526,24 @@ async function maybeRewriteHtml(request, env, res) {
     }
   }
 
-  // bh-header-brand-v2: Breckenridge above Breckhaus A-Frame; shared all breakpoints
-  if (!html.includes("bh-header-brand-v2")) {
-    var brandCss = "<style id=\"bh-header-brand-v2\">.nav-logo.has-mark{display:flex!important;flex-direction:row!important;align-items:center!important;gap:.85rem!important;max-width:none!important}.nav-logo .nav-text{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:.18rem!important}.nav-logo .nav-eyebrow{display:block!important;font-family:\"Jost\",system-ui,sans-serif!important;font-size:.78rem!important;font-weight:500!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:rgba(201,169,110,.92)!important;line-height:1.1!important}.nav-logo .nav-wordmark{display:block!important;font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-size:clamp(1.15rem,1.6vw,1.85rem)!important;font-weight:400!important;color:var(--white,#f2ede4)!important;line-height:1.05!important;white-space:nowrap!important}.nav-logo .nav-wordmark em{font-style:italic!important}@media (min-width:1024px){.nav-links{gap:1.2rem!important;justify-content:flex-end!important;margin-left:auto!important}}</style>";
+  // bh-header-brand-v3: BRECKENRIDGE, COLORADO above Breckhaus A-frame (locked casing)
+  if (!html.includes("bh-header-brand-v3")) {
+    html = html.replace(/<style id="bh-header-brand-v\d+"[\s\S]*?<\/style>/g, "");
+    var brandCss = "<style id=\"bh-header-brand-v3\">.nav-logo.has-mark{display:flex!important;flex-direction:row!important;align-items:center!important;gap:.85rem!important;max-width:none!important}.nav-logo .nav-text{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:.18rem!important}.nav-logo .nav-eyebrow{display:block!important;font-family:\"Jost\",system-ui,sans-serif!important;font-size:.78rem!important;font-weight:500!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:rgba(201,169,110,.92)!important;line-height:1.1!important}.nav-logo .nav-wordmark{display:block!important;font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-size:clamp(1.15rem,1.6vw,1.85rem)!important;font-weight:400!important;color:var(--white,#f2ede4)!important;line-height:1.05!important;white-space:nowrap!important;text-transform:none!important}.nav-logo .nav-wordmark em{font-style:italic!important;text-transform:none!important}@media (max-width:767px){.nav-logo .nav-eyebrow{font-size:.52rem!important;letter-spacing:.14em!important}.nav-logo .nav-wordmark{font-size:1.05rem!important}}@media (min-width:1024px){.nav-links{gap:1.2rem!important;justify-content:flex-end!important;margin-left:auto!important}}</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", brandCss + "</head>"); changed = true; }
-    // Normalize wordmark to A-Frame and ensure eyebrow exists
-    html = html.replace(/Breckhaus\s*<em>Aframe<\/em>/g, "Breckhaus <em>A-Frame</em>");
-    html = html.replace(/Breckhaus\s*<em>Aframe<\/em>/g, "Breckhaus <em>A-Frame</em>");
-    if (html.includes("nav-wordmark") && !html.includes("nav-eyebrow")) {
+    html = html.replace(/(<span class="nav-wordmark">)[\s\S]*?(<\/span>)/i, '$1Breckhaus <em>A-frame</em>$2');
+    if (/<span class="nav-eyebrow">/i.test(html)) {
+      html = html.replace(/<span class="nav-eyebrow">[\s\S]*?<\/span>/i, '<span class="nav-eyebrow">BRECKENRIDGE, COLORADO</span>');
+      changed = true;
+    } else if (/<span class="nav-text">/i.test(html)) {
       html = html.replace(
         /<span class="nav-text">(\s*)<span class="nav-wordmark">/,
-        '<span class="nav-text">$1<span class="nav-eyebrow">Breckenridge, Colorado</span>$1<span class="nav-wordmark">'
+        '<span class="nav-text">$1<span class="nav-eyebrow">BRECKENRIDGE, COLORADO</span>$1<span class="nav-wordmark">'
       );
-      changed = true;
-    } else if (html.includes("nav-eyebrow")) {
-      html = html.replace(/<span class="nav-eyebrow">[^<]*<\/span>/, '<span class="nav-eyebrow">Breckenridge, Colorado</span>');
       changed = true;
     }
   }
+
 
 
   // bh-hero-debrand-v3: remove hero Breckhaus/Aframe + location; keep lede + facts; header brand stays
@@ -754,25 +791,26 @@ async function maybeRewriteHtml(request, env, res) {
   }
 
 
-  // bh-header-aframe-style-v1: header "A-Frame" uses hero italic Playfair; tighter gap after Breckhaus
-  if (!html.includes("bh-header-aframe-style-v1")) {
-    var hdrAframeCss = "<style id=\"bh-header-aframe-style-v1\">.nav-logo .nav-wordmark{display:inline-flex!important;align-items:baseline!important;gap:0!important;column-gap:0!important;word-spacing:-0.12em!important;letter-spacing:-0.01em!important;white-space:nowrap!important}.nav-logo .nav-wordmark em,.nav-logo .nav-wordmark i,.nav-logo .nav-wordmark .aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:1.05em!important;letter-spacing:-0.03em!important;margin-left:0.06em!important;padding-left:0!important;color:inherit!important;-webkit-text-fill-color:currentColor!important;}</style>";
+  // bh-header-aframe-style-v2: header A-frame italic Playfair; locked casing
+  if (!html.includes("bh-header-aframe-style-v2")) {
+    html = html.replace(/<style id="bh-header-aframe-style-v\d+"[\s\S]*?<\/style>/g, "");
+    var hdrAframeCss = "<style id=\"bh-header-aframe-style-v2\">.nav-logo .nav-wordmark{display:inline-flex!important;align-items:baseline!important;gap:0!important;column-gap:0!important;word-spacing:-0.12em!important;letter-spacing:-0.01em!important;white-space:nowrap!important;text-transform:none!important}.nav-logo .nav-wordmark em,.nav-logo .nav-wordmark i,.nav-logo .nav-wordmark .aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:1.05em!important;letter-spacing:-0.03em!important;margin-left:0.06em!important;padding-left:0!important;text-transform:none!important;color:inherit!important;-webkit-text-fill-color:currentColor!important;}</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", hdrAframeCss + "</head>"); changed = true; }
-    // Ensure A-Frame is wrapped in <em> inside wordmark
-    html = html.replace(/(<span class="nav-wordmark">)Breckhaus\s*(?:<em>)?A-?Frame(?:<\/em>)?(<\/span>)/gi, '$1Breckhaus <em>A-Frame</em>$2');
-    html = html.replace(/(<span class="nav-wordmark">)Breckhaus\s*<em>Aframe<\/em>(<\/span>)/gi, '$1Breckhaus <em>A-Frame</em>$2');
+    html = html.replace(/(<span class="nav-wordmark">)[\s\S]*?(<\/span>)/i, '$1Breckhaus <em>A-frame</em>$2');
     changed = true;
   }
 
-  // bh-hero-aframe-mid-v3: desktop solo A-frame; tablet/mobile BRECKENRIDGE + Breckhaus lockup + elevated line only
-  if (!html.includes("bh-hero-aframe-mid-v3")) {
+
+
+  // bh-hero-aframe-mid-v4: balanced hero-inner replace; desktop solo; tablet/mobile BRECKENRIDGE stack only
+  if (!html.includes("bh-hero-aframe-mid-v4")) {
     html = html.replace(/<style id="bh-hero-final-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-line-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-aframe-mid-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-pos-v\d+"[\s\S]*?<\/style>/g, "");
-    var heroAfCss = "<style id=\"bh-hero-aframe-mid-v3\">"
+    var heroAfCss = "<style id=\"bh-hero-aframe-mid-v4\">"
       + ".hero-inner{position:absolute!important;inset:0!important;left:0!important;right:0!important;top:0!important;bottom:0!important;width:100%!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;display:block!important;transform:none!important;z-index:2!important;box-sizing:border-box!important;pointer-events:none!important}"
-      + ".hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc,.hero-inner>.hero-facts,.hero .hero-facts,.hero-facts,.hero-fact-val,.hero-fact-lbl{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
+      + ".hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc,.hero-inner>.hero-facts,.hero .hero-facts,.hero-facts,.hero-fact-val,.hero-fact-lbl,.hero-lede .hl,.hero-lede .hl1,.hero-lede .hl2{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
       + ".hero-place,.hero-aframe{display:none!important;visibility:hidden!important;opacity:0!important;position:absolute!important;left:clamp(1rem,3.5vw,2.4rem)!important;margin:0!important;padding:0!important;pointer-events:none!important;z-index:3!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.4),0 2px 10px rgba(0,0,0,.25)!important}"
       + ".hero-place{top:calc(var(--nav-h,100px) + .55rem)!important;font-family:Jost,system-ui,sans-serif!important;font-size:.62rem!important;font-weight:500!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:rgba(196,194,186,.92)!important;-webkit-text-fill-color:rgba(196,194,186,.92)!important}"
       + ".hero-aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-weight:400!important;line-height:1!important;letter-spacing:-.02em!important;text-transform:none!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
@@ -791,13 +829,21 @@ async function maybeRewriteHtml(request, env, res) {
       + "</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", heroAfCss + "</head>"); changed = true; }
     var heroInnerHtml = '<div class="hero-inner"><p class="hero-place">BRECKENRIDGE, COLORADO</p><p class="hero-aframe hero-aframe--solo">A-frame</p><p class="hero-aframe hero-aframe--lockup">Breckhaus <em>A-frame</em></p><p class="hero-lede">elevated living in high country.</p></div>';
-    html = html.replace(/<div class="hero-inner">[\s\S]*?<\/div>(?=\s*<\/(?:header|section|main|div)>)/i, heroInnerHtml);
+    var heroRep = replaceBalancedOpenTag(html, /<div class="hero-inner"[^>]*>/i, heroInnerHtml);
+    html = heroRep.html; if (heroRep.changed) changed = true;
+    // Remove any orphaned leftover hero facts / old lede fragments outside hero-inner
+    html = html.replace(/<div class="hero-facts"[\s\S]*?<\/div>/gi, "");
+    // If balanced replace failed, force lede + inject stack markers
     if (!html.includes('hero-aframe--lockup') || !html.includes('hero-place')) {
-      html = html.replace(/<p class="hero-lede">[\s\S]*?<\/p>/i, '<p class="hero-place">BRECKENRIDGE, COLORADO</p><p class="hero-aframe hero-aframe--solo">A-frame</p><p class="hero-aframe hero-aframe--lockup">Breckhaus <em>A-frame</em></p><p class="hero-lede">elevated living in high country.</p>');
+      html = html.replace(/<p class="hero-lede"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-place">BRECKENRIDGE, COLORADO</p><p class="hero-aframe hero-aframe--solo">A-frame</p><p class="hero-aframe hero-aframe--lockup">Breckhaus <em>A-frame</em></p><p class="hero-lede">elevated living in high country.</p>');
+      changed = true;
     } else {
-      html = html.replace(/<p class="hero-lede">[\s\S]*?<\/p>/i, '<p class="hero-lede">elevated living in high country.</p>');
+      html = html.replace(/<p class="hero-lede"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-lede">elevated living in high country.</p>');
     }
-    // Strip legacy loc/h1/facts from hero-inner leftovers
+    // Strip stale phrases if still present anywhere in hero header
+    html = html.replace(/Twelve minutes from downtown Breckenridge\.?/gi, "");
+    html = html.replace(/Sleeps\s*8\.\s*Hot tub,[^<]*/gi, "");
+    html = html.replace(/Elevated living in the high country\.?/gi, "");
     html = html.replace(/<p class="hero-loc">[\s\S]*?<\/p>/gi, "");
     (function () {
       var inner = html.indexOf('<div class="hero-inner">');
@@ -807,9 +853,11 @@ async function maybeRewriteHtml(request, env, res) {
         var h1 = html.indexOf("<h1", inner);
         if (h1 < 0) return;
         var endInner = html.indexOf('</div>', inner);
-        if (endInner > 0 && h1 > endInner) return;
+        // use a larger window — h1 should be gone after balanced replace
         var close = html.indexOf("</h1>", h1);
         if (close < 0) return;
+        // only strip h1 near hero
+        if (h1 - inner > 4000) return;
         html = html.slice(0, h1) + html.slice(close + 5);
         changed = true;
       }
@@ -835,20 +883,22 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-compact-menu-v2: tablet+mobile single Menu dropdown; Events left of weather; Reserve always visible
-  if (!html.includes("bh-compact-menu-v2")) {
+  // bh-compact-menu-v3: mobile/tablet = Menu, Events, weather, Reserve only (balanced mnav removal)
+  if (!html.includes("bh-compact-menu-v3")) {
     html = html.replace(/<style id="bh-tablet-menu-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-compact-menu-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-mobile-header-dense-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<script id="bh-tablet-menu-js"[\s\S]*?<\/script>/g, "");
-    var cMenuCss = "<style id=\"bh-compact-menu-v2\">"
+    html = html.replace(/<script id="bh-compact-menu-js"[\s\S]*?<\/script>/g, "");
+    var cMenuCss = "<style id=\"bh-compact-menu-v3\">"
       + "@media (max-width:1023px){"
       + "header,nav,.nav-end{overflow:visible!important}"
       + "nav{display:flex!important;align-items:center!important;gap:.45rem!important;min-width:0!important}"
       + ".nav-logo{flex:0 0 auto!important;min-width:0!important}"
       + ".nav-end{flex:1 1 auto!important;min-width:0!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:.28rem!important}"
-      + ".nav-links,.nav-more,.bh-mnav{display:none!important}"
-      + ".bh-tmenu{position:relative!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;margin-right:auto!important;z-index:330!important}"
+      + ".nav-links,.nav-more,.bh-mnav{display:none!important;visibility:hidden!important;pointer-events:none!important}"
+      + ".nav-end > a:not(#header-reserve):not(.btn-gold){display:none!important}"
+      + ".bh-tmenu{position:relative!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;order:0!important;margin-right:auto!important;z-index:330!important}"
       + ".bh-tmenu>summary{list-style:none!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:.3rem!important;min-height:2.25rem!important;padding:.35rem .62rem!important;border:1px solid rgba(242,237,228,.22)!important;border-radius:999px!important;background:rgba(20,20,16,.55)!important;color:var(--cream,#F2EDE4)!important;font-family:Jost,system-ui,sans-serif!important;font-size:.66rem!important;font-weight:500!important;letter-spacing:.08em!important;text-transform:uppercase!important;white-space:nowrap!important}"
       + ".bh-tmenu>summary::-webkit-details-marker{display:none}"
       + ".bh-tmenu>summary::after{content:\"\";display:inline-block;width:.42rem;height:.42rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);opacity:.75;margin-top:-.12rem}"
@@ -856,8 +906,8 @@ async function maybeRewriteHtml(request, env, res) {
       + ".bh-tmenu-panel{position:absolute!important;top:calc(100% + 8px)!important;left:0!important;min-width:12.5rem!important;max-height:min(70vh,26rem)!important;overflow-y:auto!important;padding:.45rem!important;background:rgba(13,13,11,.97)!important;border:1px solid rgba(242,237,228,.2)!important;border-radius:12px!important;box-shadow:0 14px 40px rgba(0,0,0,.45)!important;display:flex!important;flex-direction:column!important;gap:.08rem!important;z-index:420!important}"
       + ".bh-tmenu-panel a{display:block!important;padding:.55rem .6rem!important;border-radius:8px!important;color:var(--cream,#F2EDE4)!important;text-decoration:none!important;font-family:Jost,system-ui,sans-serif!important;font-size:.72rem!important;letter-spacing:.06em!important;text-transform:uppercase!important}"
       + ".bh-tmenu-panel a:hover,.bh-tmenu-panel a:focus-visible{background:rgba(242,237,228,.06)!important;outline:none!important}"
-      + ".bh-ev,.bh-wx,#header-reserve,nav .nav-end>a.btn-gold{flex:0 0 auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important}"
-      + ".bh-ev{order:1!important;margin:0 .12rem 0 .1rem!important}"
+      + ".bh-ev,.bh-wx,#header-reserve,nav .nav-end>a.btn-gold{flex:0 0 auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;margin-left:0!important;margin-right:0!important}"
+      + ".bh-ev{order:1!important;margin:0 .12rem!important}"
       + ".bh-wx{order:2!important;margin:0 .12rem!important}"
       + "#header-reserve,nav .nav-end>a.btn-gold{order:3!important;margin-left:0!important;white-space:nowrap!important}"
       + "}"
@@ -883,12 +933,19 @@ async function maybeRewriteHtml(request, env, res) {
     var tMenuHtml = "<details class=\"bh-tmenu\" id=\"bh-tmenu\"><summary>Menu</summary><div class=\"bh-tmenu-panel\" role=\"menu\"><a href=\"#house\">Basecamp</a><a href=\"#layout\">Layout</a><a href=\"#flyover\">Flyover</a><a href=\"#gallery\">Photos</a><a href=\"#reviews\">Reviews</a><a href=\"#seasons\">Seasons</a><a href=\"#area\">The area</a><a href=\"#faq\">FAQ</a><a href=\"#contact\">Contact</a></div></details>";
     var tMenuJs = "<script id=\"bh-compact-menu-js\">(function(){var m=document.getElementById(\"bh-tmenu\");if(!m)return;document.addEventListener(\"pointerdown\",function(e){if(!m.contains(e.target))m.removeAttribute(\"open\");},true);document.addEventListener(\"keydown\",function(e){if(e.key===\"Escape\")m.removeAttribute(\"open\");});m.querySelectorAll(\"a\").forEach(function(a){a.addEventListener(\"click\",function(){m.removeAttribute(\"open\");});});})();</script>";
     if (html.includes("</head>")) { html = html.replace("</head>", cMenuCss + "</head>"); changed = true; }
+    // Remove existing tmenu / mnav with balanced matching, then insert clean Menu before Events/wx/Reserve
+    if (html.includes('id="bh-tmenu"')) {
+      var tRep = replaceBalancedOpenTag(html, /<details\s+class="bh-tmenu"[^>]*>/i, "");
+      html = tRep.html; if (tRep.changed) changed = true;
+    }
     if (html.includes('id="bh-mnav"')) {
-      html = html.replace(/<div class="bh-mnav"[\s\S]*?<\/div>/, tMenuHtml);
-      changed = true;
-    } else if (html.includes('id="bh-tmenu"')) {
-      // already present
-    } else if (html.includes('id="bh-ev"')) {
+      var mRep = replaceBalancedOpenTag(html, /<div\s+class="bh-mnav"[^>]*>/i, "");
+      html = mRep.html; if (mRep.changed) changed = true;
+    }
+    // Scrub orphaned top-level nav links left by prior non-greedy replaces
+    html = html.replace(/<\/details>\s*(?:<a href="#[^"]+"[^>]*>[^<]*<\/a>\s*)+/, "");
+    html = html.replace(/(?:<a href="#(?:flyover|gallery|faq|contact|layout|reviews|area|seasons|house)"[^>]*>[^<]*<\/a>\s*)+(?=<div class="bh-ev"|<div class="bh-wx"|<a class="btn-gold" id="header-reserve")/g, "");
+    if (html.includes('id="bh-ev"')) {
       html = html.replace(/(<div class="bh-ev"\s+id="bh-ev")/, tMenuHtml + "$1");
       changed = true;
     } else if (html.includes('id="bh-wx"')) {
@@ -898,11 +955,75 @@ async function maybeRewriteHtml(request, env, res) {
       html = html.replace(/(<a class="btn-gold" id="header-reserve")/, tMenuHtml + "$1");
       changed = true;
     }
+
+    // Rebuild nav-end: keep logo siblings; force Menu → Events → weather → Reserve inside .nav-end
+    (function () {
+      var navStart = html.search(/<nav\b[^>]*>/i);
+      if (navStart < 0) return;
+      var navOpenEnd = html.indexOf('>', navStart) + 1;
+      var navClose = html.toLowerCase().indexOf('</nav>', navOpenEnd);
+      if (navClose < 0) return;
+      var navInner = html.slice(navOpenEnd, navClose);
+      var logoMatch = navInner.match(/<a class="nav-logo[\s\S]*?<\/a>/i);
+      var logo = logoMatch ? logoMatch[0] : '';
+      var linksMatch = navInner.match(/<ul class="nav-links"[\s\S]*?<\/ul>/i);
+      var links = linksMatch ? linksMatch[0] : '';
+      var moreMatch = navInner.match(/<details class="nav-more"[\s\S]*?<\/details>/i);
+      var more = moreMatch ? moreMatch[0] : '';
+      function pullBalanced(fragment, openRe) {
+        var m = openRe.exec(fragment);
+        if (!m) return { item: '', rest: fragment };
+        var start = m.index;
+        var tag = (/^<([a-z0-9:-]+)/i.exec(m[0]) || [])[1];
+        if (!tag) return { item: '', rest: fragment };
+        var i = start + m[0].length;
+        var depth = 1;
+        var lower = fragment.toLowerCase();
+        var t = tag.toLowerCase();
+        while (i < fragment.length && depth > 0) {
+          var no = lower.indexOf('<' + t, i);
+          var nc = lower.indexOf('</' + t, i);
+          if (nc < 0) break;
+          if (no >= 0 && no < nc) {
+            var ch = lower[no + 1 + t.length];
+            if (ch === '>' || ch === ' ' || ch === '\n' || ch === '\t' || ch === '/') depth++;
+            i = no + 1 + t.length;
+            continue;
+          }
+          depth--;
+          if (depth === 0) {
+            var closeEnd = lower.indexOf('>', nc) + 1;
+            return { item: fragment.slice(start, closeEnd), rest: fragment.slice(0, start) + fragment.slice(closeEnd) };
+          }
+          i = nc + 2 + t.length;
+        }
+        return { item: '', rest: fragment };
+      }
+      var rest = navInner;
+      var tmenu = '';
+      var ev = '';
+      var wx = '';
+      var reserve = '';
+      var pulled;
+      pulled = pullBalanced(rest, /<details\s+[^>]*class="[^"]*bh-tmenu[^"]*"[^>]*>/i); if (pulled.item) { tmenu = pulled.item; rest = pulled.rest; }
+      pulled = pullBalanced(rest, /<div\s+[^>]*class="[^"]*bh-ev[^"]*"[^>]*>/i); if (pulled.item) { ev = pulled.item; rest = pulled.rest; }
+      pulled = pullBalanced(rest, /<div\s+[^>]*class="[^"]*bh-wx[^"]*"[^>]*>/i); if (pulled.item) { wx = pulled.item; rest = pulled.rest; }
+      var rMatch = rest.match(/<a class="btn-gold" id="header-reserve"[\s\S]*?<\/a>/i);
+      if (rMatch) { reserve = rMatch[0]; rest = rest.replace(rMatch[0], ''); }
+      if (!tmenu) tmenu = tMenuHtml;
+      if (!reserve) reserve = '<a class="btn-gold" id="header-reserve" href="/book" data-hospitable-cta aria-haspopup="dialog">Reserve</a>';
+      var newNav = logo + '\n    <div class="nav-end">\n      ' + links + '\n      ' + more + '\n      ' + tmenu + ev + wx + reserve + '\n    </div>\n  ';
+      html = html.slice(0, navOpenEnd) + newNav + html.slice(navClose);
+      changed = true;
+    })();
+
     if (html.includes("</body>") && !html.includes('bh-compact-menu-js')) {
       html = html.replace("</body>", tMenuJs + "</body>");
       changed = true;
     }
   }
+
+
 
 
 

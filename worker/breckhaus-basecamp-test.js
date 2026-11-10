@@ -816,35 +816,37 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-hero-fourline-v5: beige lede/mins (yesterday putty), periods, desktop lower near patio
-  if (!html.includes("bh-hero-fourline-v5")) {
+  // bh-hero-fourline-v6: restore Nov 9 lockup sizes; Breckhaus + italic putty Aframe; beige ledes
+  if (!html.includes("bh-hero-fourline-v6")) {
     html = html.replace(/<style id="bh-hero-final-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-line-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-aframe-mid-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-fourline-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-pos-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-debrand-v\d+"[\s\S]*?<\/style>/g, "");
-    var heroFourCss = "<style id=\"bh-hero-fourline-v5\">"
-      + ".hero-inner{position:absolute!important;inset:0!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:0!important;z-index:2!important;box-sizing:border-box!important;pointer-events:none!important;transform:none!important}"
+    var heroFourCss = "<style id=\"bh-hero-fourline-v6\">"
+      + ".hero-inner{position:absolute!important;inset:0!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:0!important;z-index:2!important;box-sizing:border-box!important;pointer-events:none!important;transform:translate(-1vw,-10vh)!important}"
       + ".hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc,.hero-inner>.hero-facts,.hero .hero-facts,.hero-facts,.hero-fact-val,.hero-fact-lbl,.hero-place,.hero-lede .hl,.hero-lede .hl1,.hero-lede .hl2,.hero-aframe--solo,.hero-aframe--lockup{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
-      + ".hero-brand,.hero-aframe,.hero-lede,.hero-mins{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;max-width:min(92vw,36rem)!important;margin:0!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;text-align:left!important;pointer-events:none!important;z-index:3!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.45),0 2px 10px rgba(0,0,0,.28)!important}"
-      + ".hero-brand{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:normal!important;font-weight:400!important;font-size:clamp(2.4rem,5.2vw,4.6rem)!important;line-height:1.02!important;letter-spacing:-.02em!important;text-transform:none!important;color:rgba(242,237,228,.96)!important;-webkit-text-fill-color:rgba(242,237,228,.96)!important}"
-      + ".hero-aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:clamp(2.4rem,5.2vw,4.6rem)!important;line-height:1.02!important;letter-spacing:-.03em!important;margin-top:.02em!important;text-transform:none!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
+      + ".hero-brand,.hero-aframe,.hero-lede,.hero-mins{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;max-width:min(94vw,42rem)!important;margin:0!important;padding:0 0 0 clamp(1rem,3.5vw,2.5rem)!important;text-align:left!important;pointer-events:none!important;z-index:3!important;white-space:nowrap!important;text-shadow:0 1px 1px rgba(0,0,0,.75),0 2px 18px rgba(0,0,0,.55)!important}"
+      /* Mobile base — Nov 9 .hero h1 */
+      + ".hero-brand{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:normal!important;font-weight:400!important;font-size:clamp(2.825rem,12vw,4.525rem)!important;line-height:.92!important;letter-spacing:-.01em!important;text-transform:none!important;color:rgba(242,237,228,.96)!important;-webkit-text-fill-color:rgba(242,237,228,.96)!important}"
+      + ".hero-aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:clamp(2.825rem,12vw,4.525rem)!important;line-height:.92!important;letter-spacing:-.01em!important;margin-top:0!important;text-transform:none!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
       + ".hero-aframe em{font-style:italic!important;font-weight:400!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
-      + ".hero-lede,.hero-mins{font-family:Jost,system-ui,sans-serif!important;font-style:normal!important;font-weight:400!important;font-size:clamp(.95rem,1.55vw,1.15rem)!important;line-height:1.45!important;letter-spacing:.01em!important;white-space:normal!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
-      + ".hero-lede{margin-top:1.05rem!important}"
+      + ".hero-lede,.hero-mins{font-family:Jost,system-ui,sans-serif!important;font-style:normal!important;font-weight:400!important;font-size:1.075rem!important;line-height:1.65!important;letter-spacing:.01em!important;white-space:normal!important;max-width:34rem!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
+      + ".hero-lede{margin-top:1rem!important}"
       + ".hero-mins{margin-top:.35rem!important}"
-      /* Desktop: lower the whole lockup toward patio door / window band */
-      + "@media (min-width:1024px){.hero-inner{justify-content:flex-end!important;padding-bottom:clamp(4.5rem,14vh,8.5rem)!important;padding-top:0!important}.hero-lede,.hero-mins{font-size:1.075rem!important;max-width:34rem!important;line-height:1.55!important}}"
-      + "@media (max-width:1023px){.hero-brand,.hero-aframe{font-size:clamp(2.05rem,7vw,3.2rem)!important}.hero-lede,.hero-mins{font-size:clamp(.9rem,2.4vw,1.05rem)!important;max-width:88vw!important}}"
-      + "@media (max-width:767px){.hero-brand,.hero-aframe,.hero-lede,.hero-mins{padding-left:.85rem!important}.hero-brand,.hero-aframe{font-size:clamp(1.85rem,9.2vw,2.45rem)!important;white-space:normal!important}.hero-lede,.hero-mins{font-size:.92rem!important;max-width:90vw!important}}"
+      /* Tablet+ — Nov 9 @media (min-width:768px) */
+      + "@media (min-width:768px){.hero-brand,.hero-aframe{font-size:clamp(4.325rem,9vw,6.525rem)!important}.hero-lede,.hero-mins{font-size:1.145rem!important;max-width:38rem!important}.hero-inner{padding-bottom:3.2rem!important}}"
+      /* Desktop — Nov 9 @media (min-width:1280px) */
+      + "@media (min-width:1280px){.hero-brand,.hero-aframe{font-size:7.125rem!important}.hero-inner{padding:0 2.5rem 4.2rem!important}.hero-lede,.hero-mins{font-size:1.145rem!important;max-width:38rem!important}}"
+      + "@media (max-width:767px){.hero-brand,.hero-aframe,.hero-lede,.hero-mins{padding-left:.85rem!important}.hero-brand,.hero-aframe{white-space:normal!important;max-width:92vw!important}.hero-lede,.hero-mins{max-width:90vw!important}}"
       + "</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", heroFourCss + "</head>"); changed = true; }
-    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breck House</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country.</p><p class="hero-mins">Twelve minutes to Breckenridge.</p></div>';
+    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breckhaus</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country.</p><p class="hero-mins">12 minutes to Breckenridge.</p></div>';
     var heroRep = replaceBalancedOpenTag(html, /<div class="hero-inner"[^>]*>/i, heroInnerHtml);
     html = heroRep.html; if (heroRep.changed) changed = true;
     html = html.replace(/<div class="hero-facts"[\s\S]*?<\/div>/gi, "");
-    if (!html.includes("hero-brand") || !html.includes("hero-mins") || html.includes(">A-frame<") || !html.includes("high country.</p>") || !html.includes("Breckenridge.</p>")) {
+    if (!html.includes("hero-brand") || !html.includes("hero-mins") || html.includes(">A-frame<") || html.includes("Breck House") || !html.includes("high country.</p>") || !html.includes("12 minutes to Breckenridge.</p>")) {
       html = html.replace(/<p class="hero-aframe"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-aframe"><em>Aframe</em></p>');
       html = html.replace(/<div class="hero-inner"[^>]*>[\s\S]*?<\/div>/i, heroInnerHtml);
       changed = true;

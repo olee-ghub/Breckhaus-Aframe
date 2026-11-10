@@ -37,7 +37,7 @@
     if (!d || !d.time || !d.time.length) throw new Error("shape");
     btn.querySelector(".bh-wx-icon").innerHTML = icon(d.weather_code[0]);
     btn.querySelector(".bh-wx-hi").textContent = Math.round(d.temperature_2m_max[0]) + "°";
-    btn.querySelector(".bh-wx-date").textContent = label(d.time[0]);
+    var dateEl=btn.querySelector(".bh-wx-date"); if(dateEl){ dateEl.textContent=""; dateEl.hidden=true; dateEl.setAttribute("aria-hidden","true"); }
     var html = "";
     for (var i = 0; i < Math.min(7, d.time.length); i++) {
       html += '<div class="bh-wx-day"><span class="bh-wx-dlabel">' + label(d.time[i]) + '</span><span class="bh-wx-icon" aria-hidden="true">' + icon(d.weather_code[i]) + '</span><span class="bh-wx-hi">' + Math.round(d.temperature_2m_max[i]) + '°</span><span class="bh-wx-lo">' + Math.round(d.temperature_2m_min[i]) + '°</span></div>';
@@ -46,6 +46,6 @@
     root.setAttribute("data-state", "ready");
   }).catch(function () {
     root.setAttribute("data-state", "error");
-    btn.querySelector(".bh-wx-date").textContent = "Forecast";
+    var dateEl=btn.querySelector(".bh-wx-date"); if(dateEl){ dateEl.hidden=true; }
   });
 })();

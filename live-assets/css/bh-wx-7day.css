@@ -33,3 +33,5 @@
   .bh-wx-trigger .bh-wx-date{max-width:4.8rem;overflow:hidden;text-overflow:ellipsis}
   .bh-wx-panel{position:absolute;top:calc(100% + 8px);right:0;left:auto;width:min(18rem,calc(100vw - 24px));min-width:0;max-height:min(60vh,20rem)}
 }
+
+.bh-wx-trigger .bh-wx-date{display:none!important}

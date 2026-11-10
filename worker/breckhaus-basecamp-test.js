@@ -508,29 +508,26 @@ async function maybeRewriteHtml(request, env, res) {
     }
   }
 
-  // bh-hero-title-v2: keep hero title; Playfair hero style; tighter Breckhaus/Aframe gap;
-  // hide hero location line only (Breckenridge, Colorado) — header brand stays
-  if (!html.includes("bh-hero-title-v2")) {
+
+  // bh-hero-debrand-v3: remove hero Breckhaus/Aframe + location; keep lede + facts; header brand stays
+  if (!html.includes("bh-hero-debrand-v3")) {
+    html = html.replace(/<style id="bh-hero-title-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-debrand-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-loc-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-loc-color-v\d+"[\s\S]*?<\/style>/g, "");
-    var heroTitleCss = "<style id=\"bh-hero-loc-v2\"></style><style id=\"bh-hero-title-v2\">"
-      + ".hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc{display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;width:1px!important}"
-      + ".hero-inner>h1,.hero h1{display:block!important;visibility:visible!important;position:relative!important;left:auto!important;width:auto!important;height:auto!important;max-height:none!important;overflow:visible!important;font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-weight:400!important;font-style:normal!important;font-size:clamp(2.9rem,11vw,6.6rem)!important;line-height:.78!important;letter-spacing:-.02em!important;color:var(--white,#f2ede4)!important;margin:0 0 .85rem!important;text-shadow:0 1px 2px rgba(0,0,0,.55),0 2px 14px rgba(0,0,0,.42)!important}"
-      + ".hero-inner>h1 br,.hero h1 br{content:\"\";display:block!important;margin-top:-.12em!important;line-height:0!important}"
-      + ".hero-inner>h1 em,.hero h1 em{display:inline-block!important;font-style:italic!important;font-weight:400!important;color:rgba(242,237,228,.95)!important;letter-spacing:-.025em!important;margin-left:0!important;padding-left:0!important}"
-      + ".nav-logo .nav-wordmark{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-weight:400!important;font-style:normal!important;letter-spacing:-.02em!important;word-spacing:-.08em!important;line-height:1!important}"
-      + ".nav-logo .nav-wordmark em{font-style:italic!important;font-weight:400!important;margin-left:.08em!important;letter-spacing:-.03em!important}"
+    var heroDebrandCss = "<style id=\"bh-hero-loc-v2\"></style><style id=\"bh-hero-debrand-v3\">"
+      + ".hero-inner>h1,.hero h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc{display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-9999px!important;width:1px!important;clip:rect(0,0,0,0)!important}"
+      + ".hero-inner>.hero-lede,.hero .hero-lede,.hero-inner>.hero-facts,.hero .hero-facts{display:block!important;visibility:visible!important;position:relative!important;left:auto!important;width:auto!important;height:auto!important;max-height:none!important;overflow:visible!important;font-size:inherit!important;line-height:inherit!important;clip:auto!important}"
+      + ".nav-logo .nav-wordmark{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-weight:400!important;letter-spacing:-.02em!important;word-spacing:-.1em!important}"
+      + ".nav-logo .nav-wordmark em{font-style:italic!important;margin-left:.06em!important}"
       + "</style>";
     if (html.includes("</head>")) {
-      html = html.replace("</head>", heroTitleCss + "</head>");
+      html = html.replace("</head>", heroDebrandCss + "</head>");
       changed = true;
     }
-    // Remove location lines from hero only
     html = html.replace(/<p class=\"hero-loc\">[\s\S]*?<\/p>/gi, "");
     html = html.replace(/<p class=\"eyebrow\">\s*Breckenridge,\s*Colorado\s*<\/p>/gi, "");
     html = html.replace(/<p class=\"eyebrow\">\s*BRECKENRIDGE,\s*COLORADO\s*<\/p>/gi, "");
-    // Normalize hero H1 to Breckhaus + italic Aframe (two-line)
     (function () {
       var inner = html.indexOf('<div class="hero-inner">');
       if (inner < 0) return;
@@ -540,11 +537,13 @@ async function maybeRewriteHtml(request, env, res) {
       if (close < 0) return;
       var lede = html.indexOf('class="hero-lede"', inner);
       if (lede > 0 && h1 > lede) return;
-      html = html.slice(0, h1) + "<h1>Breckhaus<br /><em>Aframe</em></h1>" + html.slice(close + 5);
+      html = html.slice(0, h1) + html.slice(close + 5);
       changed = true;
     })();
     changed = true;
   }
+
+
   // bh-discovery-v1 canonical for live hosts
   {
     const c = ensureCanonical(html, request);
@@ -658,6 +657,109 @@ async function maybeRewriteHtml(request, env, res) {
   if (!html.includes("bh-wx-7day-fix-v1")) {
     var wxFixCss = "<style id=\"bh-wx-7day-fix-v1\">.bh-wx{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;position:relative!important;z-index:320!important}.bh-wx-panel{position:absolute!important;top:calc(100% + 10px)!important;right:0!important;left:auto!important;max-height:min(70vh,24rem)!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important}.bh-wx-days{display:flex!important;flex-direction:column!important;gap:.15rem!important}@media (max-width:1023px){header,nav,.nav-end{overflow:visible!important}.nav-end{gap:.35rem!important;min-width:0!important}.bh-mnav,.bh-mnav-house,.nav-more{min-width:0!important;flex:1 1 auto!important}.bh-wx{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;margin-left:.2rem!important;margin-right:.2rem!important}#header-reserve,nav .nav-end>a.btn-gold{display:inline-flex!important;visibility:visible!important;flex:0 0 auto!important;margin-left:0!important}.bh-wx-panel{max-height:min(65vh,22rem)!important}}@media (max-width:767px){.bh-wx{margin-left:auto!important}.bh-wx-panel{position:absolute!important;top:calc(100% + 8px)!important;right:0!important;left:auto!important;width:min(18rem,calc(100vw - 24px))!important;min-width:0!important;max-height:min(60vh,20rem)!important}}</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", wxFixCss + "</head>"); changed = true; }
+  }
+
+
+  // bh-wx-trigger-nodate-v1: trigger shows icon + temp only; dates stay in dropdown
+  if (!html.includes("bh-wx-trigger-nodate-v1")) {
+    var wxNoDateCss = "<style id=\"bh-wx-trigger-nodate-v1\">.bh-wx-trigger .bh-wx-date{display:none!important;width:0!important;height:0!important;overflow:hidden!important;margin:0!important;padding:0!important}</style>";
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", wxNoDateCss + "</head>");
+      changed = true;
+    }
+    // Patch inline weather script if present: stop writing date onto trigger
+    html = html.replace(
+      /btn\.querySelector\(\"\.bh-wx-date\"\)\.textContent\s*=\s*label\(d\.time\[0\]\);/g,
+      'var __bhWxDate=btn.querySelector(".bh-wx-date");if(__bhWxDate){__bhWxDate.textContent="";__bhWxDate.hidden=true;}'
+    );
+    html = html.replace(
+      /btn\.querySelector\(\"\.bh-wx-date\"\)\.textContent\s*=\s*\"Forecast\";/g,
+      'var __bhWxDate=btn.querySelector(".bh-wx-date");if(__bhWxDate){__bhWxDate.hidden=true;}'
+    );
+    changed = true;
+  }
+
+
+
+  // bh-local-events-v1: header Local Events dropdown left of weather; eight GoBreck shortlist items
+  if (!html.includes("bh-local-events-v1")) {
+    html = html.replace(/<style id="bh-local-events-v\d+"[\s\S]*?<\/style>/g, "");
+    html = html.replace(/<script id="bh-local-events-js"[\s\S]*?<\/script>/g, "");
+    html = html.replace(/<div class="bh-ev"[\s\S]*?<\/div>(?=\s*(?:<div class="bh-wx"|<a class="btn-gold" id="header-reserve"))/g, "");
+    var evCss = "<style id=\"bh-local-events-v1\">.bh-ev{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;margin:0 .2rem 0 .35rem;z-index:321;visibility:visible;opacity:1}\n.bh-ev-trigger{appearance:none;border:1px solid rgba(242,237,228,.22);background:rgba(20,20,16,.55);color:var(--cream,#F2EDE4);cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .6rem;border-radius:999px;font-family:Jost,system-ui,sans-serif;line-height:1;min-height:2rem;flex:0 0 auto;white-space:nowrap}\n.bh-ev-trigger:focus-visible{outline:2px solid rgba(201,169,110,.7);outline-offset:2px}\n.bh-ev-trigger .bh-ev-label{font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}\n.bh-ev-trigger .bh-ev-label-short{display:none}\n.bh-ev-trigger .bh-ev-caret{width:.45rem;height:.45rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);opacity:.7;margin-left:.05rem;transition:transform .18s ease}\n.bh-ev[open] .bh-ev-caret{transform:rotate(225deg);margin-top:.2rem}\n.bh-ev-panel{display:none;position:absolute;top:calc(100% + 10px);right:0;left:auto;width:min(22rem,calc(100vw - 24px));max-height:min(70vh,28rem);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:.55rem;background:rgba(13,13,11,.97);border:1px solid rgba(242,237,228,.2);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);z-index:410}\n.bh-ev[open] .bh-ev-panel{display:flex;flex-direction:column;gap:.2rem}\n.bh-ev-panel-title{font-family:Jost,system-ui,sans-serif;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(201,169,110,.9);padding:.2rem .35rem .45rem;flex:0 0 auto}\n.bh-ev-list{display:flex;flex-direction:column;gap:.15rem}\n.bh-ev-item{display:flex;flex-direction:column;gap:.18rem;padding:.55rem .5rem;border-radius:8px;color:var(--cream,#F2EDE4);text-decoration:none;font-family:Jost,system-ui,sans-serif;border:1px solid transparent}\n.bh-ev-item:hover,.bh-ev-item:focus-visible{background:rgba(242,237,228,.06);border-color:rgba(201,169,110,.28);outline:none}\n.bh-ev-item-name{font-size:.78rem;font-weight:500;letter-spacing:.02em;line-height:1.25;color:var(--cream,#F2EDE4)}\n.bh-ev-item-date{font-size:.62rem;letter-spacing:.04em;color:rgba(201,169,110,.92)}\n.bh-ev-item-desc{font-size:.66rem;line-height:1.35;color:rgba(242,237,228,.72)}\n@media (max-width:1023px){\n  header,nav,.nav-end{overflow:visible!important}\n  .bh-ev{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;margin-left:.15rem!important;margin-right:.15rem!important;order:1}\n  .bh-wx{order:2}\n  #header-reserve,nav .nav-end>a.btn-gold{order:3}\n  .bh-ev-trigger{padding:.3rem .5rem;gap:.32rem}\n  .bh-ev-trigger .bh-ev-label{font-size:.6rem;letter-spacing:.05em}\n  .bh-ev-panel{max-height:min(65vh,26rem)}\n}\n@media (max-width:767px){\n  .bh-ev{margin-left:auto!important}\n  .bh-wx{margin-left:.2rem!important}\n  .bh-ev-trigger .bh-ev-label-full{display:none}\n  .bh-ev-trigger .bh-ev-label-short{display:inline}\n  .bh-ev-panel{position:absolute;top:calc(100% + 8px);right:0;left:auto;width:min(20rem,calc(100vw - 20px));min-width:0;max-height:min(60vh,24rem)}\n}</style>";
+    var evHtml = "<div class=\"bh-ev\" id=\"bh-ev\"><button type=\"button\" class=\"bh-ev-trigger\" id=\"bh-ev-trigger\" aria-expanded=\"false\" aria-controls=\"bh-ev-panel\" aria-label=\"Local events in Breckenridge\"><span class=\"bh-ev-label bh-ev-label-full\">Local Events</span><span class=\"bh-ev-label bh-ev-label-short\">Events</span><span class=\"bh-ev-caret\" aria-hidden=\"true\"></span></button><div class=\"bh-ev-panel\" id=\"bh-ev-panel\" role=\"region\" aria-label=\"Local events\" hidden><div class=\"bh-ev-panel-title\">Breckenridge · Local events</div><div class=\"bh-ev-list\" id=\"bh-ev-list\"></div></div></div>";
+    var evJs = "<script id=\"bh-local-events-js\">(function () {\n  var root = document.getElementById(\"bh-ev\");\n  var btn = document.getElementById(\"bh-ev-trigger\");\n  var panel = document.getElementById(\"bh-ev-panel\");\n  var list = document.getElementById(\"bh-ev-list\");\n  if (!root || !btn || !panel || !list) return;\n\n  var EVENTS = [\n    {\n      name: \"Opening Day — Kingdom of Breck\",\n      date: \"Wed Nov 11, 2026\",\n      desc: \"Peak 8 opens with donuts, DJ sets, and a first-chair banner break.\",\n      href: \"https://gobreck.com/winter-spring/best-winter-events-in-breckenridge/\"\n    },\n    {\n      name: \"Breck Sky Fest kickoff\",\n      date: \"Wed Nov 11, 5:30–7:00 PM\",\n      desc: \"Public dark-sky evening with BOEC at the Wilderness Campus.\",\n      href: \"https://gobreck.com/guide/stargazing-in-breckenridge/\"\n    },\n    {\n      name: \"Other Worlds immersive art\",\n      date: \"Daily through mid-Nov\",\n      desc: \"Immersive family art exhibition at Old Masonic Hall (Breck Create).\",\n      href: \"https://gobreck.com/event/breckenridge-international-festival-of-arts/\"\n    },\n    {\n      name: \"Summit Historical Society Holiday Bazaar\",\n      date: \"Sat Nov 14, 2026\",\n      desc: \"Community holiday bazaar at Summit High School.\",\n      href: \"https://gobreck.com/events/\"\n    },\n    {\n      name: \"AstroTours stargazing at Beaver Run\",\n      date: \"Wed Nov 18, 5:30–7:15 PM\",\n      desc: \"Guided telescope tour during Breck Sky Fest month.\",\n      href: \"https://gobreck.com/guide/stargazing-in-breckenridge/\"\n    },\n    {\n      name: \"Lighting of Breckenridge + Race of the Santas\",\n      date: \"Sat Dec 5, 2026\",\n      desc: \"Dog parade, Santa race, Moose March, and 5 PM lighting of 250k lights on Main Street.\",\n      href: \"https://gobreck.com/event/lighting-breckenridge-race-santas/\"\n    },\n    {\n      name: \"Breckenridge Ullr Fest\",\n      date: \"Dec 17–19, 2026\",\n      desc: \"63rd Pray-for-Snow fest: parade, Shotski attempt, bonfire, Rockstar Energy Open.\",\n      href: \"https://gobreck.com/event/ullr-fest/\"\n    },\n    {\n      name: \"New Year’s Eve Torchlight Parade + Fireworks\",\n      date: \"Wed Dec 31, 2026\",\n      desc: \"Peak 9 torchlight (Glow Worm for kids) then fireworks to ring in the year.\",\n      href: \"https://gobreck.com/event/new-years-eve-in-breckenridge/\"\n    }\n  ];\n\n  function esc(s) {\n    return String(s)\n      .replace(/&/g, \"&amp;\")\n      .replace(/</g, \"&lt;\")\n      .replace(/>/g, \"&gt;\")\n      .replace(/\"/g, \"&quot;\");\n  }\n\n  function closeWeather() {\n    var wx = document.getElementById(\"bh-wx\");\n    var wxBtn = document.getElementById(\"bh-wx-trigger\");\n    var wxPanel = document.getElementById(\"bh-wx-panel\");\n    if (!wx) return;\n    wx.removeAttribute(\"open\");\n    if (wxBtn) wxBtn.setAttribute(\"aria-expanded\", \"false\");\n    if (wxPanel) wxPanel.hidden = true;\n  }\n\n  function setOpen(on) {\n    if (on) {\n      closeWeather();\n      root.setAttribute(\"open\", \"\");\n      btn.setAttribute(\"aria-expanded\", \"true\");\n      panel.hidden = false;\n      panel.scrollTop = 0;\n    } else {\n      root.removeAttribute(\"open\");\n      btn.setAttribute(\"aria-expanded\", \"false\");\n      panel.hidden = true;\n    }\n  }\n\n  var html = \"\";\n  for (var i = 0; i < EVENTS.length; i++) {\n    var e = EVENTS[i];\n    html +=\n      '<a class=\"bh-ev-item\" href=\"' +\n      esc(e.href) +\n      '\" target=\"_blank\" rel=\"noopener noreferrer\">' +\n      '<span class=\"bh-ev-item-name\">' +\n      esc(e.name) +\n      \"</span>\" +\n      '<span class=\"bh-ev-item-date\">' +\n      esc(e.date) +\n      \"</span>\" +\n      '<span class=\"bh-ev-item-desc\">' +\n      esc(e.desc) +\n      \"</span>\" +\n      \"</a>\";\n  }\n  list.innerHTML = html;\n\n  btn.addEventListener(\"click\", function (e) {\n    e.preventDefault();\n    e.stopPropagation();\n    setOpen(!root.hasAttribute(\"open\"));\n  });\n  document.addEventListener(\n    \"pointerdown\",\n    function (e) {\n      if (!root.contains(e.target)) setOpen(false);\n    },\n    true\n  );\n  document.addEventListener(\"keydown\", function (e) {\n    if (e.key === \"Escape\") setOpen(false);\n  });\n})();</script>";
+    if (html.includes("</head>")) { html = html.replace("</head>", evCss + "</head>"); changed = true; }
+    if (!html.includes('id="bh-ev"')) {
+      if (html.includes('id="bh-wx"')) {
+        html = html.replace(/(<div class="bh-wx"\s+id="bh-wx")/, evHtml + "$1");
+        changed = true;
+      } else if (html.includes('id="header-reserve"')) {
+        html = html.replace(/(<a class="btn-gold" id="header-reserve")/, evHtml + "$1");
+        changed = true;
+      }
+    }
+    if (html.includes("</body>")) { html = html.replace("</body>", evJs + "</body>"); changed = true; }
+  }
+
+
+  // bh-hero-final-v1: always strip hero brand title/location after other injects
+  {
+    html = html.replace(/<style id="bh-hero-title-v\d+"[\s\S]*?<\/style>/g, "");
+    if (!html.includes("bh-hero-final-v1") && html.includes("</head>")) {
+      html = html.replace("</head>", "<style id=\"bh-hero-final-v1\">.hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}.hero-inner>.hero-lede,.hero .hero-lede,.hero-inner>.hero-facts,.hero .hero-facts{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;width:auto!important;height:auto!important;max-height:none!important;overflow:visible!important;font-size:inherit!important;line-height:inherit!important;clip:auto!important}</style>" + "</head>");
+      changed = true;
+    }
+    html = html.replace(/<p class=\"hero-loc\">[\s\S]*?<\/p>/gi, "");
+    html = html.replace(/<p class=\"eyebrow\">\s*Breckenridge,\s*Colorado\s*<\/p>/gi, "");
+    html = html.replace(/<p class=\"eyebrow\">\s*BRECKENRIDGE,\s*COLORADO\s*<\/p>/gi, "");
+    (function () {
+      var inner = html.indexOf('<div class="hero-inner">');
+      if (inner < 0) return;
+      var guard = 0;
+      while (guard++ < 5) {
+        var h1 = html.indexOf("<h1", inner);
+        if (h1 < 0) return;
+        var lede = html.indexOf('class="hero-lede"', inner);
+        var facts = html.indexOf('class="hero-facts"', inner);
+        var limit = Math.min(lede > 0 ? lede : inner + 4000, facts > 0 ? facts : inner + 4000);
+        if (h1 > limit) return;
+        var close = html.indexOf("</h1>", h1);
+        if (close < 0) return;
+        html = html.slice(0, h1) + html.slice(close + 5);
+        changed = true;
+      }
+    })();
+  }
+
+
+  // bh-house-stat-beds-v1: add 3 bed / 3 bath to #house h-stat line (same gold separators)
+  if (!html.includes("bh-house-stat-beds-v1")) {
+    var houseStatRe = /(<p class="h-stat">)\s*<span>\s*2,?700\s*sq\s*ft\s*<\/span>\s*<span>\s*sleeps\s*8\s*<\/span>\s*<\/p>/i;
+    var houseStatNext = html.replace(
+      houseStatRe,
+      '$1<span>2,700 sq ft</span><span>three bedroom, three bath</span><span>sleeps 8</span></p>'
+    );
+    if (houseStatNext !== html) {
+      html = houseStatNext;
+      changed = true;
+    }
+    // Marker so we do not thrash; also covers already-updated markup
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", "<!-- bh-house-stat-beds-v1 -->" + "</head>");
+      changed = true;
+    }
+  }
+
+
+  // bh-header-aframe-style-v1: header "A-Frame" uses hero italic Playfair; tighter gap after Breckhaus
+  if (!html.includes("bh-header-aframe-style-v1")) {
+    var hdrAframeCss = "<style id=\"bh-header-aframe-style-v1\">.nav-logo .nav-wordmark{display:inline-flex!important;align-items:baseline!important;gap:0!important;column-gap:0!important;word-spacing:-0.12em!important;letter-spacing:-0.01em!important;white-space:nowrap!important}.nav-logo .nav-wordmark em,.nav-logo .nav-wordmark i,.nav-logo .nav-wordmark .aframe{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:1.05em!important;letter-spacing:-0.03em!important;margin-left:0.06em!important;padding-left:0!important;color:inherit!important;-webkit-text-fill-color:currentColor!important;}</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", hdrAframeCss + "</head>"); changed = true; }
+    // Ensure A-Frame is wrapped in <em> inside wordmark
+    html = html.replace(/(<span class="nav-wordmark">)Breckhaus\s*(?:<em>)?A-?Frame(?:<\/em>)?(<\/span>)/gi, '$1Breckhaus <em>A-Frame</em>$2');
+    html = html.replace(/(<span class="nav-wordmark">)Breckhaus\s*<em>Aframe<\/em>(<\/span>)/gi, '$1Breckhaus <em>A-Frame</em>$2');
+    changed = true;
   }
 
   if (changed) {

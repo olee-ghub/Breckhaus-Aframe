@@ -762,6 +762,62 @@ async function maybeRewriteHtml(request, env, res) {
     changed = true;
   }
 
+  // bh-hero-line-v1: single italic Playfair line in lower third; hide specs/facts/title
+  if (!html.includes("bh-hero-line-v1")) {
+    html = html.replace(/<style id="bh-hero-final-v\d+"[\s\S]*?<\/style>/g, "");
+    html = html.replace(/<style id="bh-hero-line-v\d+"[\s\S]*?<\/style>/g, "");
+    var heroLineCss = "<style id=\"bh-hero-line-v1\">"
+      + ".hero-inner{position:absolute!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;height:33.333%!important;width:100%!important;max-width:none!important;margin:0!important;padding:0 1.25rem!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;transform:none!important;z-index:2!important;box-sizing:border-box!important}"
+      + ".hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc,.hero-inner>.hero-facts,.hero .hero-facts,.hero-facts{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
+      + ".hero-inner>.hero-lede,.hero .hero-lede,.hero-lede{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;overflow:visible!important;margin:0!important;padding:0!important;clip:auto!important;"
+      + "font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;font-size:2.75rem!important;line-height:1.15!important;letter-spacing:-.02em!important;"
+      + "color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.45),0 2px 10px rgba(0,0,0,.28)!important}"
+      + ".hero-lede .hl,.hero-lede .hl1,.hero-lede .hl2,.hero-lede .nw{display:inline!important;margin:0!important;white-space:nowrap!important;font:inherit!important;color:inherit!important}"
+      + "@media (min-width:768px) and (max-width:1023px){.hero-lede,.hero-inner>.hero-lede,.hero .hero-lede{font-size:1.75rem!important}}"
+      + "@media (max-width:767px){.hero-inner{padding:0 .75rem!important}.hero-lede,.hero-inner>.hero-lede,.hero .hero-lede{font-size:clamp(1.05rem,5.1vw,1.25rem)!important;letter-spacing:-.02em!important}}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", heroLineCss + "</head>"); changed = true; }
+    // Replace hero lede with the single overlay phrase
+    html = html.replace(/<p class="hero-lede">[\s\S]*?<\/p>/i, '<p class="hero-lede">elevated living in high country</p>');
+    // Strip remaining hero title/location; facts stay in DOM but are CSS-hidden (nested divs)
+    html = html.replace(/<p class="hero-loc">[\s\S]*?<\/p>/gi, "");
+    (function () {
+      var inner = html.indexOf('<div class="hero-inner">');
+      if (inner < 0) return;
+      var guard = 0;
+      while (guard++ < 5) {
+        var h1 = html.indexOf("<h1", inner);
+        if (h1 < 0) return;
+        var lede = html.indexOf('class="hero-lede"', inner);
+        var limit = lede > 0 ? lede : inner + 4000;
+        if (h1 > limit) return;
+        var close = html.indexOf("</h1>", h1);
+        if (close < 0) return;
+        html = html.slice(0, h1) + html.slice(close + 5);
+        changed = true;
+      }
+    })();
+    changed = true;
+  }
+
+
+  // bh-house-lede-v1: house intro without hero phrase; cathedral + guest essentials
+  if (!html.includes("bh-house-lede-v1")) {
+    var houseLede = "Experience architectural alpine living beneath sweeping cathedral ceilings. Sleeps eight, with a hot tub, barrel sauna, and Mount Quandary views\u2014just twelve minutes from downtown Breckenridge.";
+    var houseLedeRe = /(<section[^>]*id="house"[^>]*>[\s\S]*?<p class="lede">)[\s\S]*?(<\/p>)/i;
+    var houseLedeNext = html.replace(houseLedeRe, "$1" + houseLede + "$2");
+    if (houseLedeNext !== html) {
+      html = houseLedeNext;
+      changed = true;
+    }
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", "<!-- bh-house-lede-v1 -->" + "</head>");
+      changed = true;
+    }
+  }
+
+
+
   if (changed) {
     h.set("Cache-Control", "public, max-age=0, must-revalidate");
     h.delete("content-length");

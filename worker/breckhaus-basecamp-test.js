@@ -840,7 +840,7 @@ async function maybeRewriteHtml(request, env, res) {
       + "@media (max-width:767px){.hero-brand,.hero-aframe,.hero-lede,.hero-mins{padding-left:.85rem!important}.hero-brand,.hero-aframe{font-size:clamp(1.85rem,9.2vw,2.45rem)!important;white-space:normal!important}.hero-lede,.hero-mins{font-size:.92rem!important;max-width:90vw!important}}"
       + "</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", heroFourCss + "</head>"); changed = true; }
-    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breck House</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country.</p><p class="hero-mins">Twelve minutes to Breckenridge.</p></div>';
+    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breckhaus</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country.</p><p class="hero-mins">Twelve minutes to Breckenridge.</p></div>';
     var heroRep = replaceBalancedOpenTag(html, /<div class="hero-inner"[^>]*>/i, heroInnerHtml);
     html = heroRep.html; if (heroRep.changed) changed = true;
     html = html.replace(/<div class="hero-facts"[\s\S]*?<\/div>/gi, "");
@@ -1042,6 +1042,117 @@ async function maybeRewriteHtml(request, env, res) {
       changed = true;
     }
   }
+
+  // bh-nav-events-wx-bar-v1: Menu + Events + weather + Reserve on ≤1023; Events LEFT of temperature
+  if (!html.includes("bh-nav-events-wx-bar-v1")) {
+    html = html.replace(/<style id="bh-nav-events-wx-bar-v\d+"[\s\S]*?<\/style>/g, "");
+    var barCss = "<style id=\"bh-nav-events-wx-bar-v1\">"
+      + "@media (max-width:1023px){"
+      + ".nav-end{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:.3rem!important;flex-wrap:nowrap!important}"
+      + ".bh-tmenu{display:flex!important;order:0!important;margin-right:auto!important;position:relative!important;flex:0 0 auto!important}"
+      /* Restore Events + weather as visible nav pills; Events immediately left of weather */
+      + ".bh-ev,.bh-wx{position:relative!important;top:auto!important;right:auto!important;left:auto!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;z-index:330!important;flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}"
+      + ".bh-ev{order:1!important}"
+      + ".bh-wx{order:2!important}"
+      + "#header-reserve,nav .nav-end>a.btn-gold{order:3!important;flex:0 0 auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important}"
+      + ".bh-ev-trigger,.bh-wx-trigger{position:static!important;width:auto!important;height:auto!important;min-height:2.25rem!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important}"
+      + ".bh-ev-panel,.bh-wx-panel{position:absolute!important;top:calc(100% + 8px)!important;right:0!important;left:auto!important;width:min(22rem,calc(100vw - 20px))!important;max-height:min(70vh,28rem)!important;pointer-events:auto!important}"
+      + "}"
+      + "@media (max-width:767px){"
+      + ".bh-ev-trigger .bh-ev-label-full{display:none!important}"
+      + ".bh-ev-trigger .bh-ev-label-short{display:inline!important}"
+      + ".bh-ev-trigger,.bh-wx-trigger{padding:.32rem .48rem!important}"
+      + ".bh-ev-trigger .bh-ev-label{font-size:.6rem!important}"
+      + "}"
+      + "@media (min-width:1024px){"
+      + ".bh-ev,.bh-wx{display:inline-flex!important;order:unset!important}"
+      + "}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", barCss + "</head>"); changed = true; }
+    // Ensure DOM order Menu → Events → weather → Reserve
+    (function () {
+      var navStart = html.search(/<nav\b[^>]*>/i);
+      if (navStart < 0) return;
+      var navOpenEnd = html.indexOf(">", navStart) + 1;
+      var navClose = html.toLowerCase().indexOf("</nav>", navOpenEnd);
+      if (navClose < 0) return;
+      var navInner = html.slice(navOpenEnd, navClose);
+      function pull(fragment, openRe) {
+        var m = openRe.exec(fragment);
+        if (!m) return { item: "", rest: fragment };
+        var start = m.index;
+        var tag = (/^<([a-z0-9:-]+)/i.exec(m[0]) || [])[1];
+        if (!tag) return { item: "", rest: fragment };
+        var i = start + m[0].length, depth = 1;
+        var lower = fragment.toLowerCase();
+        var t = tag.toLowerCase();
+        while (i < fragment.length && depth > 0) {
+          var no = lower.indexOf("<" + t, i);
+          var nc = lower.indexOf("</" + t, i);
+          if (nc < 0) break;
+          if (no >= 0 && no < nc) {
+            var ch = lower[no + 1 + t.length];
+            if (ch === ">" || ch === " " || ch === "\n" || ch === "\t" || ch === "/") depth++;
+            i = no + 1 + t.length;
+            continue;
+          }
+          depth--;
+          if (depth === 0) {
+            var closeEnd = lower.indexOf(">", nc) + 1;
+            return { item: fragment.slice(start, closeEnd), rest: fragment.slice(0, start) + fragment.slice(closeEnd) };
+          }
+          i = nc + 2 + t.length;
+        }
+        return { item: "", rest: fragment };
+      }
+      var logoMatch = navInner.match(/<a class="nav-logo[\s\S]*?<\/a>/i);
+      var logo = logoMatch ? logoMatch[0] : "";
+      var linksMatch = navInner.match(/<ul class="nav-links"[\s\S]*?<\/ul>/i);
+      var links = linksMatch ? linksMatch[0] : "";
+      var moreMatch = navInner.match(/<details class="nav-more"[\s\S]*?<\/details>/i);
+      var more = moreMatch ? moreMatch[0] : "";
+      var rest = navInner, tmenu = "", ev = "", wx = "", reserve = "", pulled;
+      pulled = pull(rest, /<details\s+[^>]*class="[^"]*bh-tmenu[^"]*"[^>]*>/i); if (pulled.item) { tmenu = pulled.item; rest = pulled.rest; }
+      pulled = pull(rest, /<div\s+[^>]*class="[^"]*bh-ev[^"]*"[^>]*>/i); if (pulled.item) { ev = pulled.item; rest = pulled.rest; }
+      pulled = pull(rest, /<div\s+[^>]*class="[^"]*bh-wx[^"]*"[^>]*>/i); if (pulled.item) { wx = pulled.item; rest = pulled.rest; }
+      var rMatch = rest.match(/<a class="btn-gold" id="header-reserve"[\s\S]*?<\/a>/i);
+      if (rMatch) { reserve = rMatch[0]; rest = rest.replace(rMatch[0], ""); }
+      if (!tmenu || !reserve) return;
+      var newNav = logo + "\n    <div class=\"nav-end\">\n      " + links + "\n      " + more + "\n      " + tmenu + ev + wx + reserve + "\n    </div>\n  ";
+      html = html.slice(0, navOpenEnd) + newNav + html.slice(navClose);
+      changed = true;
+    })();
+    changed = true;
+  }
+
+  // bh-hero-breckhaus-restore-v1: Breckhaus HAUS spelling, larger lockup, yesterday desktop position
+  if (!html.includes("bh-hero-breckhaus-restore-v1")) {
+    html = html.replace(/<style id="bh-hero-breckhaus-restore-v\d+"[\s\S]*?<\/style>/g, "");
+    var restoreCss = "<style id=\"bh-hero-breckhaus-restore-v1\">"
+      + ".hero-inner{position:absolute!important;inset:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;transform:translate(-1vw,-10vh)!important;padding:0!important;margin:0!important;z-index:2!important;pointer-events:none!important}"
+      + ".hero-brand,.hero-aframe{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;width:auto!important;max-width:min(94vw,40rem)!important;margin:0!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-weight:400!important;line-height:1.02!important;letter-spacing:-.02em!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.55),0 2px 10px rgba(0,0,0,.32)!important;z-index:3!important}"
+      + ".hero-brand{font-style:normal!important;font-size:clamp(2.85rem,6.2vw,5.4rem)!important;color:rgba(242,237,228,.96)!important;-webkit-text-fill-color:rgba(242,237,228,.96)!important}"
+      + ".hero-aframe,.hero-aframe em{font-style:italic!important;font-size:clamp(2.85rem,6.2vw,5.4rem)!important;letter-spacing:-.03em!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}"
+      + ".hero-aframe{margin-top:.02em!important}"
+      + ".hero-lede,.hero-mins{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;max-width:min(92vw,36rem)!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;font-family:Jost,system-ui,sans-serif!important;font-size:clamp(1rem,1.7vw,1.2rem)!important;line-height:1.45!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important;text-shadow:0 1px 2px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.28)!important}"
+      + ".hero-lede{margin-top:1.05rem!important}.hero-mins{margin-top:.35rem!important}"
+      + "@media (min-width:1024px){.hero-inner{justify-content:center!important;padding-bottom:0!important;transform:translate(-1vw,-10vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(3.2rem,5.8vw,5.6rem)!important}}"
+      + "@media (max-width:1023px){.hero-inner{transform:translate(-.5vw,-6vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.35rem,7.6vw,3.6rem)!important;white-space:nowrap!important}}"
+      + "@media (max-width:767px){.hero-inner{transform:translate(0,-4vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.15rem,10vw,2.85rem)!important;padding-left:.85rem!important;white-space:normal!important}.hero-lede,.hero-mins{padding-left:.85rem!important;font-size:.95rem!important}}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", restoreCss + "</head>"); changed = true; }
+    html = html.replace(/<p class="hero-brand"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-brand">Breckhaus</p>');
+    html = html.replace(/Breck House/g, "Breckhaus");
+    html = html.replace(/BreckHaus/g, "Breckhaus");
+    if (!html.includes('class="hero-brand"')) {
+      var heroInnerHtml2 = '<div class="hero-inner"><p class="hero-brand">Breckhaus</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country.</p><p class="hero-mins">Twelve minutes to Breckenridge.</p></div>';
+      var heroRep2 = replaceBalancedOpenTag(html, /<div class="hero-inner"[^>]*>/i, heroInnerHtml2);
+      html = heroRep2.html; if (heroRep2.changed) changed = true;
+    }
+    changed = true;
+  }
+
+
 
 
 

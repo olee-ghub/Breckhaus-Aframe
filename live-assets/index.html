@@ -2265,7 +2265,38 @@ body.has-book-bar footer { padding-bottom: 4.5rem; }
   }
     /* item 57: contact scroll room */ #contact { min-height: calc(100vh - var(--nav-h) - 260px); min-height: calc(100svh - var(--nav-h) - 260px); }
 </style>
-</head>
+<style id="bh-nav-events-wx-bar-v1">/* Menu + Events + weather + Reserve; Events LEFT of temperature (≤1023) */
+@media (max-width:1023px){
+  .nav-end{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:.3rem!important;flex-wrap:nowrap!important}
+  .bh-tmenu{display:flex!important;order:0!important;margin-right:auto!important;position:relative!important;flex:0 0 auto!important}
+  .bh-ev,.bh-wx{position:relative!important;top:auto!important;right:auto!important;left:auto!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;z-index:330!important;flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+  .bh-ev{order:1!important}
+  .bh-wx{order:2!important}
+  #header-reserve,nav .nav-end>a.btn-gold{order:3!important;flex:0 0 auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important}
+  .bh-ev-trigger,.bh-wx-trigger{position:static!important;width:auto!important;height:auto!important;min-height:2.25rem!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important}
+  .bh-ev-panel,.bh-wx-panel{position:absolute!important;top:calc(100% + 8px)!important;right:0!important;left:auto!important;width:min(22rem,calc(100vw - 20px))!important;max-height:min(70vh,28rem)!important;pointer-events:auto!important}
+}
+@media (max-width:767px){
+  .bh-ev-trigger .bh-ev-label-full{display:none!important}
+  .bh-ev-trigger .bh-ev-label-short{display:inline!important}
+  .bh-ev-trigger,.bh-wx-trigger{padding:.32rem .48rem!important}
+  .bh-ev-trigger .bh-ev-label{font-size:.6rem!important}
+}
+@media (min-width:1024px){
+  .bh-ev,.bh-wx{display:inline-flex!important}
+}
+</style><style id="bh-hero-breckhaus-restore-v1">/* Breckhaus lockup: HAUS spelling, larger size, yesterday desktop position */
+.hero-inner{position:absolute!important;inset:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;transform:translate(-1vw,-10vh)!important;padding:0!important;margin:0!important;z-index:2!important;pointer-events:none!important}
+.hero-brand,.hero-aframe{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;width:auto!important;max-width:min(94vw,40rem)!important;margin:0!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;font-family:"Playfair Display","Cormorant Garamond",serif!important;font-weight:400!important;line-height:1.02!important;letter-spacing:-.02em!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.55),0 2px 10px rgba(0,0,0,.32)!important;z-index:3!important}
+.hero-brand{font-style:normal!important;font-size:clamp(2.85rem,6.2vw,5.4rem)!important;color:rgba(242,237,228,.96)!important;-webkit-text-fill-color:rgba(242,237,228,.96)!important}
+.hero-aframe,.hero-aframe em{font-style:italic!important;font-size:clamp(2.85rem,6.2vw,5.4rem)!important;letter-spacing:-.03em!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}
+.hero-aframe{margin-top:.02em!important}
+.hero-lede,.hero-mins{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;max-width:min(92vw,36rem)!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;font-family:Jost,system-ui,sans-serif!important;font-size:clamp(1rem,1.7vw,1.2rem)!important;line-height:1.45!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important;text-shadow:0 1px 2px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.28)!important}
+.hero-lede{margin-top:1.05rem!important}.hero-mins{margin-top:.35rem!important}
+@media (min-width:1024px){.hero-inner{justify-content:center!important;padding-bottom:0!important;transform:translate(-1vw,-10vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(3.2rem,5.8vw,5.6rem)!important}}
+@media (max-width:1023px){.hero-inner{transform:translate(-.5vw,-6vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.35rem,7.6vw,3.6rem)!important}}
+@media (max-width:767px){.hero-inner{transform:translate(0,-4vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.15rem,10vw,2.85rem)!important;padding-left:.85rem!important;white-space:normal!important}.hero-lede,.hero-mins{padding-left:.85rem!important;font-size:.95rem!important}}
+</style></head>
 <body style="background:#0d0d0b;color:#F2EDE4">
 <div class="photo-set-label" role="note">Base Camp Photos · TEST</div>
   <a class="skip" href="#house">Skip to the house</a>
@@ -2319,7 +2350,7 @@ body.has-book-bar footer { padding-bottom: 4.5rem; }
     </div>
     <div class="hero-scrim"></div>
     <div class="hero-inner">
-      <p class="hero-brand">Breck House</p>
+      <p class="hero-brand">Breckhaus</p>
       <p class="hero-aframe"><em>Aframe</em></p>
       <p class="hero-lede">Elevated living in high country</p>
       <p class="hero-mins">Twelve minutes to Breckenridge</p>

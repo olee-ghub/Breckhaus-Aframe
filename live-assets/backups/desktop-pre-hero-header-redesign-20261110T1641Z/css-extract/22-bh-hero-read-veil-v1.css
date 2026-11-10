@@ -1,0 +1,14 @@
+
+/* Keep bh-hero-scrim-v1 brightening; add a light veil between photo and headline */
+.hero-scrim{ position:absolute; }
+.hero-scrim::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background: linear-gradient(to bottom,
+    rgba(13,13,11,0.05) 0%,
+    rgba(13,13,11,0.07) 42%,
+    rgba(13,13,11,0.16) 72%,
+    rgba(13,13,11,0.24) 100%);
+}

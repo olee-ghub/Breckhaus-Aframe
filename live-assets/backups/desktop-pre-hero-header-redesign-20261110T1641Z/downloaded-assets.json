@@ -1,0 +1,42 @@
+[
+  {
+    "path": "assets/logo-mark-nav.png",
+    "bytes": 3107
+  },
+  {
+    "path": "assets/logo.png",
+    "bytes": 102651
+  },
+  {
+    "path": "assets/logo-lockup.png",
+    "bytes": 282551
+  },
+  {
+    "path": "img/hero.jpg",
+    "bytes": 751848
+  },
+  {
+    "path": "img/hero-poster.jpg",
+    "bytes": 362442
+  },
+  {
+    "path": "fonts/jost-latin.woff2",
+    "bytes": 26576
+  },
+  {
+    "path": "fonts/playfair-display-italic-latin.woff2",
+    "bytes": 21884
+  },
+  {
+    "path": "fonts/cormorant-italic-latin.woff2",
+    "bytes": 39260
+  },
+  {
+    "path": "fonts/playfair-display-latin.woff2",
+    "bytes": 38404
+  },
+  {
+    "path": "fonts/cormorant-latin.woff2",
+    "bytes": 37640
+  }
+]

@@ -1,0 +1,7 @@
+
+  /* hero line-1 fit 2026-11-03: widen subtitle so line 1 fits; shift block left only as far as needed to clear the barrel sauna in #4 */
+  @media (min-width: 640px) and (max-width: 767px) { .hero-lede { max-width: none; } }
+  @media (min-width: 768px) {
+    .hero-lede { max-width: 44rem; }
+    .hero-inner { max-width: none; margin: 0; padding-left: max(var(--pad), min(calc((100vw - 1180px) / 2 + var(--pad)), calc(57.1vw - 706px))); }
+  }

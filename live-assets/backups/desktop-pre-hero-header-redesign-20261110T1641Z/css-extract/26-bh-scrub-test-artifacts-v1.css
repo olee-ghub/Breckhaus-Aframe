@@ -1,0 +1,1 @@
+.photo-set-label,#photo-set-label,[class*="photo-set-label"],.test-badge,[data-test-badge]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;position:absolute!important;left:-9999px!important;width:0!important;height:0!important;overflow:hidden!important;font-size:0!important}

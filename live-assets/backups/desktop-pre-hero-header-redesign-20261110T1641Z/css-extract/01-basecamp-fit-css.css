@@ -1,0 +1,18 @@
+
+    /* Base Camp: portrait photos in landscape slots -> show whole photo (no hard crop) */
+    .shot.fit { background: #1a1815; }
+    /* item 30: portraits fill their tiles (cover); lightbox still shows the full photo */
+    .shot.fit img { aspect-ratio: 3 / 4; object-fit: cover !important; object-position: 50% 50%; background: #1a1815; }
+    .shot[data-slot="gallery-19-bedrooms-01"] img { object-position: 50% 69% !important; } /* king-forest: bed, nightstand, lamp */
+    .shot[data-slot="gallery-21-bedrooms-03"] img { object-position: 50% 72% !important; } /* king-coffee: dresser, TV, coffee cart */
+    @media (min-width: 768px) { .mosaic .shot.fit img { min-height: 0; max-height: 520px; } }
+    @media (min-width: 1280px) { .mosaic .shot.fit img { aspect-ratio: auto; height: 100%; max-height: none; } }
+    .shot.fit:hover img { transform: none; }
+    .shot.soft img { width:100%; height:100%; object-fit:cover; }
+    /* item85b: horizontal carousel soft tiles need intrinsic box + bg (lazy+0-size was blank) */
+    #gallery .gc-track > .shot.soft { background:#1a1815; }
+    #gallery .gc-track > .shot.soft img { position:static!important; width:100%!important; height:100%!important; object-fit:cover!important; }
+    @media (min-width: 768px) { .mosaic .shot.soft { height:100%; } }
+    /* Around Breckenridge strip */
+    .around { margin-top: 2.5rem; }
+    .around .eyebrow { margin-bottom: .75rem; display:block; }

@@ -1,0 +1,109 @@
+
+/* text crispness — weight / tracking / light shadow on dark grounds */
+    body {
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    .section-title,
+    .gallery-group-title {
+      font-weight: 400;
+      letter-spacing: -0.008em;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+    }
+    .eyebrow,
+    .nav-links a,
+    .fact-l,
+    .caption,
+    .gallery-note,
+    .shot figcaption,
+    .shot .lbl,
+    .flyover-play-label,
+    .gallery-group-title .eyebrow {
+      letter-spacing: 0.12em;
+    }
+    .nav-logo .nav-eyebrow {
+      letter-spacing: 0.22em;
+      font-weight: 500;
+    }
+    .nav-logo .nav-wordmark {
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    }
+    .lede,
+    .amenity-list li,
+    .faq-item p,
+    .faq-facts li,
+    .rule p,
+    .rule-facts li,
+    .rule-note,
+    .floor p,
+    .place-card p,
+    .gallery-intro .lede {
+      font-weight: 400;
+      letter-spacing: 0.015em;
+    }
+    .fact-n,
+    .hero-fact-val,
+    .place-card-img .place-n,
+    .faq-item h3,
+    .rule h3,
+    .floor h3,
+    .place-card h3,
+    .contact-card h3 {
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    .faq-item h3,
+    .rule h3,
+    .floor h3,
+    .place-card h3 {
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+    }
+    .caption,
+    .gallery-note,
+    .amenity-list li,
+    .nav-links a {
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+    }
+    /* cream/contact panel: no dark-ground shadow */
+    .contact .section-title,
+    .contact .lede,
+    .contact-card h3,
+    .contact-card p,
+    .contact-form label {
+      text-shadow: none;
+      letter-spacing: 0.01em;
+      font-weight: 400;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 767px) {
+      body { letter-spacing: 0.005em; }
+      .section-title,
+      .gallery-group-title,
+      .faq-item h3,
+      .rule h3,
+      .floor h3,
+      .place-card h3,
+      .caption,
+      .gallery-note,
+      .amenity-list li,
+      .nav-links a,
+      .nav-logo .nav-wordmark {
+        text-shadow: none;
+      }
+      .eyebrow,
+      .nav-links a,
+      .fact-l,
+      .caption,
+      .gallery-note,
+      .shot figcaption,
+      .shot .lbl,
+      .flyover-play-label,
+      .gallery-group-title .eyebrow {
+        letter-spacing: 0.1em;
+      }
+    }

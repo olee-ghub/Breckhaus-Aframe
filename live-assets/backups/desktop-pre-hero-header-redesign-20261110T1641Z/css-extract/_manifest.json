@@ -1,0 +1,284 @@
+[
+  {
+    "index": 0,
+    "id": "style-00",
+    "file": "00-style-00.css",
+    "bytes": 43072
+  },
+  {
+    "index": 1,
+    "id": "basecamp-fit-css",
+    "file": "01-basecamp-fit-css.css",
+    "bytes": 1434
+  },
+  {
+    "index": 2,
+    "id": "basecamp-logo-css",
+    "file": "02-basecamp-logo-css.css",
+    "bytes": 3169
+  },
+  {
+    "index": 3,
+    "id": "bc-layout-v1",
+    "file": "03-bc-layout-v1.css",
+    "bytes": 8567
+  },
+  {
+    "index": 4,
+    "id": "hero-mobile-css",
+    "file": "04-hero-mobile-css.css",
+    "bytes": 619
+  },
+  {
+    "index": 5,
+    "id": "hero-shift-css",
+    "file": "05-hero-shift-css.css",
+    "bytes": 444
+  },
+  {
+    "index": 6,
+    "id": "hero-balance-css",
+    "file": "06-hero-balance-css.css",
+    "bytes": 732
+  },
+  {
+    "index": 7,
+    "id": "amenity-grid-css",
+    "file": "07-amenity-grid-css.css",
+    "bytes": 615
+  },
+  {
+    "index": 8,
+    "id": "floor-cards-css",
+    "file": "08-floor-cards-css.css",
+    "bytes": 269
+  },
+  {
+    "index": 9,
+    "id": "foot-license-css",
+    "file": "09-foot-license-css.css",
+    "bytes": 339
+  },
+  {
+    "index": 10,
+    "id": "contact-btn-css",
+    "file": "10-contact-btn-css.css",
+    "bytes": 768
+  },
+  {
+    "index": 11,
+    "id": "rhythm-css",
+    "file": "11-rhythm-css.css",
+    "bytes": 1440
+  },
+  {
+    "index": 12,
+    "id": "item30-stack-css",
+    "file": "12-item30-stack-css.css",
+    "bytes": 2354
+  },
+  {
+    "index": 13,
+    "id": "item35-sharp-css",
+    "file": "13-item35-sharp-css.css",
+    "bytes": 1084
+  },
+  {
+    "index": 14,
+    "id": "item36-gallery-css",
+    "file": "14-item36-gallery-css.css",
+    "bytes": 3222
+  },
+  {
+    "index": 15,
+    "id": "item37-amenity-css",
+    "file": "15-item37-amenity-css.css",
+    "bytes": 639
+  },
+  {
+    "index": 16,
+    "id": "item38-flyover-css",
+    "file": "16-item38-flyover-css.css",
+    "bytes": 428
+  },
+  {
+    "index": 17,
+    "id": "item39-hero-mobile-css",
+    "file": "17-item39-hero-mobile-css.css",
+    "bytes": 247
+  },
+  {
+    "index": 18,
+    "id": "bh-text-crisp",
+    "file": "18-bh-text-crisp.css",
+    "bytes": 2375
+  },
+  {
+    "index": 19,
+    "id": "bh-nav-taller",
+    "file": "19-bh-nav-taller.css",
+    "bytes": 1247
+  },
+  {
+    "index": 20,
+    "id": "bh-nav-wordmark-lg",
+    "file": "20-bh-nav-wordmark-lg.css",
+    "bytes": 576
+  },
+  {
+    "index": 21,
+    "id": "bh-hero-scrim-v1",
+    "file": "21-bh-hero-scrim-v1.css",
+    "bytes": 196
+  },
+  {
+    "index": 22,
+    "id": "bh-hero-read-veil-v1",
+    "file": "22-bh-hero-read-veil-v1.css",
+    "bytes": 369
+  },
+  {
+    "index": 23,
+    "id": "bh-hero-pos-v1",
+    "file": "23-bh-hero-pos-v1.css",
+    "bytes": 64
+  },
+  {
+    "index": 24,
+    "id": "bh-hero-text-sharp-v1",
+    "file": "24-bh-hero-text-sharp-v1.css",
+    "bytes": 935
+  },
+  {
+    "index": 25,
+    "id": "bh-nav-lockup-v1",
+    "file": "25-bh-nav-lockup-v1.css",
+    "bytes": 1049
+  },
+  {
+    "index": 26,
+    "id": "bh-scrub-test-artifacts-v1",
+    "file": "26-bh-scrub-test-artifacts-v1.css",
+    "bytes": 328
+  },
+  {
+    "index": 27,
+    "id": "bh-dedupe-hero-loc-v2",
+    "file": "27-bh-dedupe-hero-loc-v2.css",
+    "bytes": 315
+  },
+  {
+    "index": 28,
+    "id": "bh-hero-loc-v2",
+    "file": "28-bh-hero-loc-v2.css",
+    "bytes": 507
+  },
+  {
+    "index": 29,
+    "id": "bh-loc-color-v1",
+    "file": "29-bh-loc-color-v1.css",
+    "bytes": 134
+  },
+  {
+    "index": 30,
+    "id": "bh-nav-tabs-v31",
+    "file": "30-bh-nav-tabs-v31.css",
+    "bytes": 7909
+  },
+  {
+    "index": 31,
+    "id": "bh-area-around-v2",
+    "file": "31-bh-area-around-v2.css",
+    "bytes": 956
+  },
+  {
+    "index": 32,
+    "id": "item60-carousel",
+    "file": "32-item60-carousel.css",
+    "bytes": 1616
+  },
+  {
+    "index": 33,
+    "id": "item62-font-consistency",
+    "file": "33-item62-font-consistency.css",
+    "bytes": 754
+  },
+  {
+    "index": 34,
+    "id": "item63-carousel-arrows",
+    "file": "34-item63-carousel-arrows.css",
+    "bytes": 465
+  },
+  {
+    "index": 35,
+    "id": "item64-carousel-compact",
+    "file": "35-item64-carousel-compact.css",
+    "bytes": 820
+  },
+  {
+    "index": 36,
+    "id": "item64-footer-tighten",
+    "file": "36-item64-footer-tighten.css",
+    "bytes": 400
+  },
+  {
+    "index": 37,
+    "id": "item68-book-heading",
+    "file": "37-item68-book-heading.css",
+    "bytes": 92
+  },
+  {
+    "index": 38,
+    "id": "item66-flyover-cap",
+    "file": "38-item66-flyover-cap.css",
+    "bytes": 231
+  },
+  {
+    "index": 39,
+    "id": "item67-booking-panel",
+    "file": "39-item67-booking-panel.css",
+    "bytes": 5959
+  },
+  {
+    "index": 40,
+    "id": "item69-popup-picker",
+    "file": "40-item69-popup-picker.css",
+    "bytes": 5651
+  },
+  {
+    "index": 41,
+    "id": "item70-sticky-top-bar",
+    "file": "41-item70-sticky-top-bar.css",
+    "bytes": 703
+  },
+  {
+    "index": 42,
+    "id": "item71-bookstay-drawer",
+    "file": "42-item71-bookstay-drawer.css",
+    "bytes": 44
+  },
+  {
+    "index": 43,
+    "id": "item72-category-carousels",
+    "file": "43-item72-category-carousels.css",
+    "bytes": 2564
+  },
+  {
+    "index": 44,
+    "id": "item73-inpage-reserve",
+    "file": "44-item73-inpage-reserve.css",
+    "bytes": 122
+  },
+  {
+    "index": 45,
+    "id": "item74-remove-book-section",
+    "file": "45-item74-remove-book-section.css",
+    "bytes": 1075
+  },
+  {
+    "index": 46,
+    "id": "item82-hosp-shell",
+    "file": "46-item82-hosp-shell.css",
+    "bytes": 3349
+  }
+]

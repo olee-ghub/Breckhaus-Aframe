@@ -1,0 +1,16 @@
+
+    /* item 35: text sharpness pass */
+    html { font-synthesis: none; }
+    body { font-weight: 400; }
+    .hero-fact-val, .section-title, .gallery-group-title, .gallery-intro .lede, .review blockquote,
+    .contact-form input, .contact-form textarea, .place-card-img .place-n, #quick-facts h2 { font-weight: 400; }
+    .hero .eyebrow, .hero h1 { text-shadow: 0 1px 2px rgba(0,0,0,.55), 0 2px 12px rgba(0,0,0,.42); }
+    .hero h1 em { text-shadow: 0 1px 2px rgba(0,0,0,.5), 0 2px 10px rgba(0,0,0,.38); }
+    .hero-lede { text-shadow: 0 1px 2px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.32); }
+    .flyover-play-label { text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+    .gallery-filters { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(13,13,11,.97) !important; }
+    .book-bar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(18,16,14,.985) !important; }
+    .contact .eyebrow { color: #7A5719 !important; }
+    .contact-ig-handle { color: #7A5719; }
+    .contact-form label { color: #5E4F3C; }
+  

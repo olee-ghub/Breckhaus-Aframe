@@ -1,0 +1,9 @@
+
+/* One body size, one small size; headings untouched; IG line is the single accent (~1.12x body) */
+:root{--fs-body:1.005rem;--fs-small:.745rem}
+main section p:not(.eyebrow),main section li,.lede,.gallery-intro .lede,.amen-text,.amenity-list li,.floor p,.qf-item p,
+.review blockquote,.review blockquote p,.ask-mail,.inline-mail,.contact-email-line,
+footer a,footer .foot-license,.foot-bottom{font-size:var(--fs-body)!important}
+.eyebrow,.review-date,.review-tag,.place-tag,.amen-label,.floor-tag,.when,.gallery-count,.gallery-filter,.flyover-play-label,.hero-fact-lbl,.contact label,.faq-license,.h-stat,.h-stat span{font-size:var(--fs-small)!important}
+.contact-ig{font-size:1.125rem!important}
+.contact-ig .contact-ig-handle{font-size:1em!important}

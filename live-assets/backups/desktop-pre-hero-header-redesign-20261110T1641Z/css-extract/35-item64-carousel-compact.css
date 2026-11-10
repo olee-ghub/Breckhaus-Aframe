@@ -1,0 +1,8 @@
+
+.reviews .review-grid.rc-track{align-items:flex-start!important}
+.rc-track>.review{padding-top:1rem!important;padding-bottom:1.05rem!important;gap:.5rem!important}
+.rc-track .review blockquote p{line-height:1.5!important;margin-bottom:.5em}
+.rc-track .review blockquote.rc-clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;line-clamp:5;overflow:hidden}
+@media (min-width:768px){.rc-track .review blockquote.rc-clamp{-webkit-line-clamp:4;line-clamp:4}}
+.rc-more{align-self:flex-start;background:none;border:0;padding:.35rem 0;min-height:32px;color:var(--gold);font:inherit;font-size:var(--fs-small,.745rem);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;text-decoration:underline;text-underline-offset:.3em}
+.rc-more:focus-visible{outline:1px solid var(--gold);outline-offset:3px}

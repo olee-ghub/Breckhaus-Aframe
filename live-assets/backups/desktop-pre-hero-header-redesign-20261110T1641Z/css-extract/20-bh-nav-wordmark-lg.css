@@ -1,0 +1,17 @@
+
+/* bh-nav-wordmark-lg: brand name larger than location eyebrow */
+    .nav-logo .nav-wordmark {
+      font-size: 1.9rem !important;
+    }
+    @media (max-width: 767px) {
+      .nav-logo .nav-wordmark { font-size: 1.55rem !important; }
+    }
+    @media (max-width: 480px) {
+      .nav-logo.has-mark .nav-wordmark { font-size: 1.4rem !important; }
+    }
+    @media (max-width: 430px) {
+      .nav-logo.has-mark .nav-wordmark { font-size: 1.28rem !important; }
+    }
+    @media (max-width: 400px) {
+      .nav-logo.has-mark .nav-wordmark { font-size: 1.2rem !important; }
+    }

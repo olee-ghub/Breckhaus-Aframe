@@ -1,0 +1,20 @@
+.bh-wx{position:relative;flex:0 0 auto;display:flex;align-items:center;margin:0 .35rem;z-index:320}
+.bh-wx-trigger{appearance:none;border:1px solid rgba(242,237,228,.22);background:rgba(20,20,16,.55);color:var(--cream,#F2EDE4);cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .55rem;border-radius:999px;font-family:Jost,system-ui,sans-serif;line-height:1;min-height:2rem}
+.bh-wx-trigger:focus-visible{outline:2px solid rgba(201,169,110,.7);outline-offset:2px}
+.bh-wx-trigger .bh-wx-icon,.bh-wx-day .bh-wx-icon{width:1rem;height:1rem;display:inline-flex;flex:0 0 auto}
+.bh-wx-trigger .bh-wx-icon svg,.bh-wx-day .bh-wx-icon svg{width:100%;height:100%;display:block;fill:rgba(201,169,110,.95);stroke:rgba(201,169,110,.95)}
+.bh-wx-trigger .bh-wx-hi{font-size:.72rem;font-weight:500;letter-spacing:.03em}
+.bh-wx-trigger .bh-wx-date{font-size:.58rem;font-weight:500;letter-spacing:.04em;color:rgba(242,237,228,.78);white-space:nowrap}
+.bh-wx-trigger .bh-wx-caret{width:.45rem;height:.45rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);opacity:.7;margin-left:.1rem;transition:transform .18s ease}
+.bh-wx[open] .bh-wx-caret{transform:rotate(225deg);margin-top:.2rem}
+.bh-wx-panel{display:none;position:absolute;top:calc(100% + 10px);right:0;min-width:15.5rem;padding:.55rem;background:rgba(13,13,11,.97);border:1px solid rgba(242,237,228,.2);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);z-index:400}
+.bh-wx[open] .bh-wx-panel{display:flex;flex-direction:column;gap:.15rem}
+.bh-wx-panel-title{font-family:Jost,system-ui,sans-serif;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(201,169,110,.9);padding:.2rem .35rem .45rem}
+.bh-wx-day{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:.45rem;padding:.42rem .4rem;border-radius:8px;color:var(--cream,#F2EDE4);font-family:Jost,system-ui,sans-serif}
+.bh-wx-day:hover{background:rgba(242,237,228,.06)}
+.bh-wx-day .bh-wx-dlabel{font-size:.68rem;letter-spacing:.03em;min-width:0}
+.bh-wx-day .bh-wx-icon{width:.95rem;height:.95rem}
+.bh-wx-day .bh-wx-hi{font-size:.7rem;font-weight:500}
+.bh-wx-day .bh-wx-lo{font-size:.66rem;color:rgba(242,237,228,.62)}
+@media (max-width:1023px){.bh-wx{margin-left:auto;margin-right:.25rem}.bh-wx-trigger{padding:.3rem .48rem;gap:.32rem}.bh-wx-trigger .bh-wx-date{font-size:.52rem}.bh-wx-panel{min-width:14.5rem}}
+@media (max-width:767px){.bh-wx-trigger .bh-wx-date{max-width:4.8rem;overflow:hidden;text-overflow:ellipsis}.bh-wx-panel{position:fixed;left:12px;right:12px;top:auto;min-width:0;width:auto}}

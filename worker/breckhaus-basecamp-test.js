@@ -816,15 +816,15 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-hero-fourline-v3: exactly four hero lines; A-frame uses yesterday putty grey
-  if (!html.includes("bh-hero-fourline-v3")) {
+  // bh-hero-fourline-v4: exactly four hero lines; italic putty Aframe (no hyphen), yesterday style
+  if (!html.includes("bh-hero-fourline-v4")) {
     html = html.replace(/<style id="bh-hero-final-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-line-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-aframe-mid-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-fourline-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-pos-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-hero-debrand-v\d+"[\s\S]*?<\/style>/g, "");
-    var heroFourCss = "<style id=\"bh-hero-fourline-v3\">"
+    var heroFourCss = "<style id=\"bh-hero-fourline-v4\">"
       + ".hero-inner{position:absolute!important;inset:0!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:0!important;z-index:2!important;box-sizing:border-box!important;pointer-events:none!important;transform:none!important}"
       + ".hero-inner>h1,.hero h1,.hero-inner h1,.hero-inner>.hero-loc,.hero-inner>p.eyebrow,.hero p.eyebrow,.hero-loc,.hero-inner>.hero-facts,.hero .hero-facts,.hero-facts,.hero-fact-val,.hero-fact-lbl,.hero-place,.hero-lede .hl,.hero-lede .hl1,.hero-lede .hl2,.hero-aframe--solo,.hero-aframe--lockup{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;width:1px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
       + ".hero-brand,.hero-aframe,.hero-lede,.hero-mins{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;max-width:min(92vw,36rem)!important;margin:0!important;padding:0 0 0 clamp(1rem,3.5vw,2.4rem)!important;text-align:left!important;pointer-events:none!important;z-index:3!important;white-space:nowrap!important;text-shadow:0 1px 2px rgba(0,0,0,.45),0 2px 10px rgba(0,0,0,.28)!important;color:rgba(242,237,228,.96)!important;-webkit-text-fill-color:rgba(242,237,228,.96)!important}"
@@ -837,12 +837,13 @@ async function maybeRewriteHtml(request, env, res) {
       + "@media (max-width:767px){.hero-brand,.hero-aframe,.hero-lede,.hero-mins{padding-left:.85rem!important}.hero-brand,.hero-aframe{font-size:clamp(1.85rem,9.2vw,2.45rem)!important;white-space:normal!important}.hero-lede,.hero-mins{font-size:.92rem!important;max-width:90vw!important}}"
       + "</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", heroFourCss + "</head>"); changed = true; }
-    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breck House</p><p class="hero-aframe"><em>A-frame</em></p><p class="hero-lede">Elevated living in high country</p><p class="hero-mins">Twelve minutes to Breckenridge</p></div>';
+    var heroInnerHtml = '<div class="hero-inner"><p class="hero-brand">Breck House</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country</p><p class="hero-mins">Twelve minutes to Breckenridge</p></div>';
     var heroRep = replaceBalancedOpenTag(html, /<div class="hero-inner"[^>]*>/i, heroInnerHtml);
     html = heroRep.html; if (heroRep.changed) changed = true;
     html = html.replace(/<div class="hero-facts"[\s\S]*?<\/div>/gi, "");
-    if (!html.includes("hero-brand") || !html.includes("hero-mins")) {
-      html = html.replace(/<p class="hero-lede"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-brand">Breck House</p><p class="hero-aframe"><em>A-frame</em></p><p class="hero-lede">Elevated living in high country</p><p class="hero-mins">Twelve minutes to Breckenridge</p>');
+    if (!html.includes("hero-brand") || !html.includes("hero-mins") || html.includes(">A-frame<")) {
+      html = html.replace(/<p class="hero-aframe"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-aframe"><em>Aframe</em></p>');
+      html = html.replace(/<p class="hero-lede"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-brand">Breck House</p><p class="hero-aframe"><em>Aframe</em></p><p class="hero-lede">Elevated living in high country</p><p class="hero-mins">Twelve minutes to Breckenridge</p>');
       changed = true;
     }
     html = html.replace(/Sleeps\s*8\.\s*Hot tub,[^<]*/gi, "");
@@ -869,10 +870,15 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-hero-aframe-putty-v1: yesterday putty grey on hero A-frame
-  if (!html.includes("bh-hero-aframe-putty-v1")) {
-    var puttyCss = "<style id=\"bh-hero-aframe-putty-v1\">.hero-aframe,.hero-aframe em{color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}</style>";
+  // bh-hero-aframe-putty-v2: yesterday putty italic Aframe (no hyphen)
+  if (!html.includes("bh-hero-aframe-putty-v2")) {
+    html = html.replace(/<style id="bh-hero-aframe-putty-v\d+"[\s\S]*?<\/style>/g, "");
+    var puttyCss = "<style id=\"bh-hero-aframe-putty-v2\">.hero-aframe,.hero-aframe em{font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-style:italic!important;font-weight:400!important;color:rgba(196,194,186,.96)!important;-webkit-text-fill-color:rgba(196,194,186,.96)!important}</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", puttyCss + "</head>"); changed = true; }
+    html = html.replace(/<p class="hero-aframe"[^>]*>[\s\S]*?<\/p>/i, '<p class="hero-aframe"><em>Aframe</em></p>');
+    html = html.replace(/>A-frame</gi, '>Aframe<');
+    html = html.replace(/>A-Frame</gi, '>Aframe<');
+    changed = true;
   }
 
   // bh-house-lede-v1: house intro without hero phrase; cathedral + guest essentials

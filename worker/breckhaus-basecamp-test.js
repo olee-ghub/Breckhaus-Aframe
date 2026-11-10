@@ -450,8 +450,7 @@ async function maybeRewriteHtml(request, env, res) {
     var _before = html;
     html = html.split("<p class=\"eyebrow\">Breckenridge, Colorado</p>").join("");
     html = html.split("<p class=\"eyebrow\">BRECKENRIDGE, COLORADO</p>").join("");
-    html = html.split("<span class=\"nav-eyebrow\">Breckenridge, Colorado</span>").join("");
-    (function () {
+        (function () {
       var needle = "<p class=\"eyebrow\">";
       var closeTag = "</p>";
       var g = 0;
@@ -482,6 +481,45 @@ async function maybeRewriteHtml(request, env, res) {
     })();
     if (html !== _before) changed = true;
   }
+
+
+
+  // bh-gallery-filter-pills-v2
+  if (!html.includes("bh-gallery-filter-pills-v2")) {
+    var pillCss = "<style id=\"bh-gallery-filter-pills-v2\">.gallery-filters{gap:.8rem!important;padding-top:.85rem!important;padding-bottom:.85rem!important}.gallery-filter{padding:.72rem 1.28rem!important;border-radius:999px!important}</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", pillCss + "</head>"); changed = true; }
+  }
+
+  // bh-favicon-v1: wire icon links to /favicon.ico
+  if (!html.includes("bh-favicon-v1")) {
+    var favLinks = '<link rel="icon" href="/favicon.ico" sizes="any" /><link rel="icon" type="image/png" href="/assets/logo-mark-nav.png?v=bold2" /><link rel="apple-touch-icon" href="/assets/logo-mark-nav.png?v=bold2" /><!-- bh-favicon-v1 -->';
+    if (html.includes("</head>")) {
+      html = html.replace(/<link[^>]+rel=["'](?:shortcut )?icon["'][^>]*>/gi, "");
+      html = html.replace(/<link[^>]+rel=["']apple-touch-icon["'][^>]*>/gi, "");
+      html = html.replace("</head>", favLinks + "</head>");
+      changed = true;
+    }
+  }
+
+  // bh-header-brand-v2: Breckenridge above Breckhaus A-Frame; shared all breakpoints
+  if (!html.includes("bh-header-brand-v2")) {
+    var brandCss = "<style id=\"bh-header-brand-v2\">.nav-logo.has-mark{display:flex!important;flex-direction:row!important;align-items:center!important;gap:.85rem!important;max-width:none!important}.nav-logo .nav-text{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:.18rem!important}.nav-logo .nav-eyebrow{display:block!important;font-family:\"Jost\",system-ui,sans-serif!important;font-size:.78rem!important;font-weight:500!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:rgba(201,169,110,.92)!important;line-height:1.1!important}.nav-logo .nav-wordmark{display:block!important;font-family:\"Playfair Display\",\"Cormorant Garamond\",serif!important;font-size:clamp(1.15rem,1.6vw,1.85rem)!important;font-weight:400!important;color:var(--white,#f2ede4)!important;line-height:1.05!important;white-space:nowrap!important}.nav-logo .nav-wordmark em{font-style:italic!important}@media (min-width:1024px){.nav-links{gap:1.2rem!important;justify-content:flex-end!important;margin-left:auto!important}}</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", brandCss + "</head>"); changed = true; }
+    // Normalize wordmark to A-Frame and ensure eyebrow exists
+    html = html.replace(/Breckhaus\s*<em>Aframe<\/em>/g, "Breckhaus <em>A-Frame</em>");
+    html = html.replace(/Breckhaus\s*<em>Aframe<\/em>/g, "Breckhaus <em>A-Frame</em>");
+    if (html.includes("nav-wordmark") && !html.includes("nav-eyebrow")) {
+      html = html.replace(
+        /<span class="nav-text">(\s*)<span class="nav-wordmark">/,
+        '<span class="nav-text">$1<span class="nav-eyebrow">Breckenridge, Colorado</span>$1<span class="nav-wordmark">'
+      );
+      changed = true;
+    } else if (html.includes("nav-eyebrow")) {
+      html = html.replace(/<span class="nav-eyebrow">[^<]*<\/span>/, '<span class="nav-eyebrow">Breckenridge, Colorado</span>');
+      changed = true;
+    }
+  }
+
   // bh-hero-loc-v1: move Breckenridge, Colorado into hero above h1 (lede styling)
   if (!html.includes("bh-hero-loc-v2")) {
         const heroLocCss = '<style id="bh-hero-loc-v2">.hero-inner>.hero-loc{font-family:"Jost",system-ui,sans-serif;font-size:1.075rem!important;font-weight:400!important;font-style:normal!important;letter-spacing:0.06em!important;text-transform:uppercase!important;color:rgba(242, 237, 228, 0.92)!important;-webkit-text-fill-color:rgba(242, 237, 228, 0.92)!important;line-height:1.2!important;margin:0 0 0.55rem!important;max-width:34rem;text-shadow:0 1px 2px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.32)!important}.hero-inner>.hero-loc+h1{margin-top:0!important}</style>';
@@ -687,6 +725,12 @@ var worker_default = {
       }
     }
 // Caller nav logo mark from R2
+
+    // Favicon from logo mark (R2)
+    if (url.pathname === "/favicon.ico" || url.pathname === "/apple-touch-icon.png" || url.pathname === "/apple-touch-icon-precomposed.png") {
+      return serveR2Object(request, env, LOGO_MARK_R2_KEY, "image/png", "public, max-age=86400");
+    }
+
     if (url.pathname === LOGO_MARK_PATH) {
       return serveR2Object(request, env, LOGO_MARK_R2_KEY, "image/png", "public, max-age=86400");
     }

@@ -544,6 +544,20 @@ async function maybeRewriteHtml(request, env, res) {
     }
   }
 
+  // bh-nav-logo-only-v1: hide BRECKENRIDGE / Breckhaus A-frame text beside logo (all breakpoints)
+  if (!html.includes("bh-nav-logo-only-v1")) {
+    html = html.replace(/<style id="bh-nav-logo-only-v\d+"[\s\S]*?<\/style>/g, "");
+    var logoOnlyCss = "<style id=\"bh-nav-logo-only-v1\">"
+      + ".nav-logo .nav-text,.nav-logo.has-mark .nav-text,"
+      + ".nav-logo .nav-eyebrow,.nav-logo.has-mark .nav-eyebrow,"
+      + ".nav-logo .nav-wordmark,.nav-logo.has-mark .nav-wordmark,"
+      + ".nav-logo .nav-wordmark em{display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;max-width:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;position:absolute!important;left:-10000px!important;clip:rect(0,0,0,0)!important;pointer-events:none!important}"
+      + ".nav-logo.has-mark{gap:0!important}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", logoOnlyCss + "</head>"); changed = true; }
+    changed = true;
+  }
+
 
 
   // bh-hero-debrand-v3: remove hero Breckhaus/Aframe + location; keep lede + facts; header brand stays

@@ -742,6 +742,18 @@ async function maybeRewriteHtml(request, env, res) {
     if (html.includes("</head>")) { html = html.replace("</head>", panelViewCss + "</head>"); changed = true; }
   }
 
+  // bh-wx-panel-tight-v1: mobile — close day/condition gap; shrink panel to content width
+  if (!html.includes("bh-wx-panel-tight-v1")) {
+    var wxTightCss = "<style id=\"bh-wx-panel-tight-v1\">"
+      + "@media (max-width:767px){"
+      + ".bh-wx-panel{width:max-content!important;max-width:calc(100vw - 16px)!important;min-width:0!important;left:auto!important;right:8px!important;padding:.42rem .45rem!important}"
+      + ".bh-wx-day{grid-template-columns:auto auto auto auto!important;gap:.25rem .32rem!important;padding:.36rem .28rem!important;justify-content:start!important}"
+      + ".bh-wx-day .bh-wx-dlabel{white-space:nowrap!important}"
+      + "}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", wxTightCss + "</head>"); changed = true; }
+  }
+
 
   // bh-local-events-v3: Local Events left of weather; click-throughs; omit expired; static shortlist (show 6-8)
   if (!html.includes("bh-local-events-v3")) {

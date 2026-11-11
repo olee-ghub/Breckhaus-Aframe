@@ -897,6 +897,24 @@ async function maybeRewriteHtml(request, env, res) {
     changed = true;
   }
 
+  // bh-hero-lockup-pos-v1: shift lockup down + right toward window wall; bottom pad clears sauna
+  if (!html.includes("bh-hero-lockup-pos-v1")) {
+    html = html.replace(/<style id="bh-hero-pos-v\d+"[\s\S]*?<\/style>/g, "");
+    html = html.replace(/<style id="bh-hero-lockup-pos-v\d+"[\s\S]*?<\/style>/g, "");
+    var heroPosCss = "<style id=\"bh-hero-lockup-pos-v1\">"
+      + ".hero-inner{justify-content:flex-end!important;align-items:flex-start!important;"
+      + "transform:translate(clamp(.35rem,5.5vw,4rem),0)!important;"
+      + "padding:0 0 clamp(6.5rem,24vh,11.5rem) clamp(.85rem,4.5vw,2.75rem)!important}"
+      + "@media (min-width:768px){.hero-inner{transform:translate(clamp(1rem,7.5vw,5.75rem),0)!important;"
+      + "padding:0 0 clamp(6.25rem,23vh,11rem) clamp(1.15rem,5.5vw,3.25rem)!important}}"
+      + "@media (min-width:1024px){.hero-inner{transform:translate(clamp(1.75rem,8.5vw,7rem),0)!important;"
+      + "padding:0 0 clamp(5.75rem,21vh,10.25rem) clamp(1.5rem,6.5vw,3.75rem)!important}}"
+      + "@media (max-width:767px){.hero-inner{transform:translate(.25rem,0)!important;"
+      + "padding:0 0 clamp(5.25rem,19vh,8.75rem) .85rem!important}}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", heroPosCss + "</head>"); changed = true; }
+  }
+
   // bh-house-eyebrow-v1: restore yellow "The house" label above .h-stat
   if (!html.includes("bh-house-eyebrow-v1")) {
     var houseEyebrow = '<p class="eyebrow">The house</p>';

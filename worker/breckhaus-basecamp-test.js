@@ -733,14 +733,7 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-wx-ev-panel-viewport-v1: keep weather/events dropdowns fully on-screen (tablet/mobile)
-  if (!html.includes("bh-wx-ev-panel-viewport-v1")) {
-    var panelViewCss = "<style id=\"bh-wx-ev-panel-viewport-v1\">"
-      + "@media (max-width:1023px){.bh-wx-panel,.bh-ev-panel{position:fixed!important;top:calc(var(--nav-h,68px) + 8px)!important;left:8px!important;right:8px!important;width:auto!important;min-width:0!important;max-width:none!important}}"
-      + "@media (max-width:767px){.bh-wx-panel,.bh-ev-panel{left:8px!important;right:8px!important;max-height:min(60vh,20rem)!important}}"
-      + "</style>";
-    if (html.includes("</head>")) { html = html.replace("</head>", panelViewCss + "</head>"); changed = true; }
-  }
+  // bh-wx-ev-panel-viewport-v1 injected after compact-menu (below) so left/right insets win cascade
 
 
   // bh-local-events-v3: Local Events left of weather; click-throughs; omit expired; static shortlist (show 6-8)
@@ -1067,6 +1060,17 @@ async function maybeRewriteHtml(request, env, res) {
       html = html.replace("</body>", tMenuJs + "</body>");
       changed = true;
     }
+  }
+
+  // bh-wx-ev-panel-viewport-v1: keep weather/events dropdowns fully on-screen (tablet/mobile).
+  // Always reinject last so fixed left/right:8px wins over compact-menu panel absolute/right rules.
+  {
+    html = html.replace(/<style id="bh-wx-ev-panel-viewport-v\d+"[\s\S]*?<\/style>/g, "");
+    var panelViewCss = "<style id=\"bh-wx-ev-panel-viewport-v1\">"
+      + "@media (max-width:1023px){.bh-wx-panel,.bh-ev-panel{position:fixed!important;top:calc(var(--nav-h,68px) + 8px)!important;left:8px!important;right:8px!important;width:auto!important;min-width:0!important;max-width:none!important}}"
+      + "@media (max-width:767px){.bh-wx-panel,.bh-ev-panel{left:8px!important;right:8px!important;max-height:min(60vh,20rem)!important}}"
+      + "</style>";
+    if (html.includes("</head>")) { html = html.replace("</head>", panelViewCss + "</head>"); changed = true; }
   }
 
 

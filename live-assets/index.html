@@ -2296,7 +2296,31 @@ body.has-book-bar footer { padding-bottom: 4.5rem; }
 @media (min-width:1024px){.hero-inner{justify-content:center!important;padding-bottom:0!important;transform:translate(-1vw,-10vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(3.2rem,5.8vw,5.6rem)!important}}
 @media (max-width:1023px){.hero-inner{transform:translate(-.5vw,-6vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.35rem,7.6vw,3.6rem)!important}}
 @media (max-width:767px){.hero-inner{transform:translate(0,-4vh)!important}.hero-brand,.hero-aframe,.hero-aframe em{font-size:clamp(2.15rem,10vw,2.85rem)!important;padding-left:.85rem!important;white-space:normal!important}.hero-lede,.hero-mins{padding-left:.85rem!important;font-size:.95rem!important}}
-</style></head>
+</style><style id="bh-hero-tighten-v1">/* Tighten hero: fill photo, cut black band, softer fade, pull first section up */
+.hero{min-height:0!important}
+.hero-media{height:100%!important;bottom:0!important;top:0!important;inset:0!important}
+.hero-media::after{height:18%!important;background:linear-gradient(to bottom,rgba(13,13,11,0) 0%,rgba(13,13,11,.42) 62%,var(--charcoal,#0d0d0b) 100%)!important}
+.hero-scrim{background:linear-gradient(to bottom,rgba(13,13,11,.06) 0%,rgba(13,13,11,.05) 55%,rgba(13,13,11,.22) 100%)!important}
+#house.section,.section.house{padding-top:1.6rem!important;padding-bottom:2.6rem!important}
+@media (max-width:767px){
+  .hero{min-height:68svh!important;min-height:68vh!important;max-height:74svh!important}
+  .hero-media{top:var(--nav-h,3.5rem)!important;height:auto!important;bottom:0!important}
+  .hero-media::after{height:16%!important}
+  .hero-inner{transform:translate(0,-1.5vh)!important}
+  #house.section,.section.house{padding-top:1.25rem!important;padding-bottom:2.1rem!important}
+  .section{padding-top:2.4rem!important;padding-bottom:2.4rem!important}
+}
+@media (min-width:768px) and (max-width:1023px){
+  .hero{min-height:74svh!important;min-height:74vh!important}
+  .hero-media{top:var(--nav-h,3.75rem)!important;height:auto!important;bottom:0!important}
+  .hero-inner{transform:translate(-.5vw,-3vh)!important}
+}
+@media (min-width:1024px){
+  .hero{min-height:86svh!important;min-height:86vh!important}
+  .hero-media{inset:0!important;height:auto!important}
+  .hero-inner{transform:translate(-1vw,-6vh)!important}
+  #house.section,.section.house{padding-top:2rem!important;padding-bottom:3rem!important}
+}</style></head>
 <body style="background:#0d0d0b;color:#F2EDE4">
 <div class="photo-set-label" role="note">Base Camp Photos · TEST</div>
   <a class="skip" href="#house">Skip to the house</a>

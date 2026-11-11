@@ -786,20 +786,17 @@ async function maybeRewriteHtml(request, env, res) {
   }
 
 
-  // bh-house-stat-beds-v1: add 3 bed / 3 bath to #house h-stat line (same gold separators)
-  if (!html.includes("bh-house-stat-beds-v1")) {
-    var houseStatRe = /(<p class="h-stat">)\s*<span>\s*2,?700\s*sq\s*ft\s*<\/span>\s*<span>\s*sleeps\s*8\s*<\/span>\s*<\/p>/i;
-    var houseStatNext = html.replace(
-      houseStatRe,
-      '$1<span>2,700 sq ft</span><span>three bedroom, three bath</span><span>sleeps 8</span></p>'
-    );
-    if (houseStatNext !== html) {
-      html = houseStatNext;
+  // bh-house-stat-beds-v2: keep existing .h-stat gold separators; use numeral "3 bed, 3 bath"
+  if (!html.includes("bh-house-stat-beds-v2")) {
+    html = html.replace(/<!--\s*bh-house-stat-beds-v\d+\s*-->/g, "");
+    var houseStatTarget = '<p class="h-stat"><span>2,700 sq ft</span><span>3 bed, 3 bath</span><span>sleeps 8</span></p>';
+    var houseBlockRe = /(<section[^>]*id="house"[^>]*>[\s\S]*?)(<p class="h-stat">[\s\S]*?<\/p>)/i;
+    if (houseBlockRe.test(html)) {
+      html = html.replace(houseBlockRe, "$1" + houseStatTarget);
       changed = true;
     }
-    // Marker so we do not thrash; also covers already-updated markup
     if (html.includes("</head>")) {
-      html = html.replace("</head>", "<!-- bh-house-stat-beds-v1 -->" + "</head>");
+      html = html.replace("</head>", "<!-- bh-house-stat-beds-v2 -->" + "</head>");
       changed = true;
     }
   }

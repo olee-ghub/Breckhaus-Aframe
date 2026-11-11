@@ -852,7 +852,9 @@ async function maybeRewriteHtml(request, env, res) {
     html = html.replace(/Elevated living in the high country\.?/gi, "");
     html = html.replace(/Mt\.\s*Quandary views\.?/gi, "");
     html = html.replace(/<p class="hero-loc">[\s\S]*?<\/p>/gi, "");
-    html = html.replace(/<p class="eyebrow">[\s\S]*?<\/p>/i, "");
+    // Only strip hero Breckenridge eyebrows — do NOT remove section labels like "The house"
+    html = html.replace(/<p class="eyebrow">\s*Breckenridge,\s*Colorado\s*<\/p>/gi, "");
+    html = html.replace(/<p class="eyebrow">\s*BRECKENRIDGE,\s*COLORADO\s*<\/p>/gi, "");
     (function () {
       var inner = html.indexOf('<div class="hero-inner">');
       if (inner < 0) return;
@@ -868,6 +870,20 @@ async function maybeRewriteHtml(request, env, res) {
       }
     })();
     changed = true;
+  }
+
+  // bh-house-eyebrow-v1: restore yellow "The house" label above .h-stat
+  if (!html.includes("bh-house-eyebrow-v1")) {
+    var houseEyebrow = '<p class="eyebrow">The house</p>';
+    var houseHeadRe = /(<section[^>]*id="house"[^>]*>[\s\S]*?<div>\s*)(?:<p class="eyebrow">[\s\S]*?<\/p>\s*)?(<p class="h-stat">)/i;
+    if (houseHeadRe.test(html)) {
+      html = html.replace(houseHeadRe, "$1" + houseEyebrow + "\n            $2");
+      changed = true;
+    }
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", "<!-- bh-house-eyebrow-v1 -->" + "</head>");
+      changed = true;
+    }
   }
 
 

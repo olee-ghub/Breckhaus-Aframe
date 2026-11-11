@@ -808,17 +808,19 @@ async function maybeRewriteHtml(request, env, res) {
   }
 
 
-  // bh-house-stat-beds-v2: keep existing .h-stat gold separators; use numeral "3 bed, 3 bath"
-  if (!html.includes("bh-house-stat-beds-v2")) {
+  // bh-house-stat-beds-v3: keep existing .h-stat gold separators; "3 bedroom, 3 bath" (CSS uppercases)
+  if (!html.includes("bh-house-stat-beds-v3")) {
     html = html.replace(/<!--\s*bh-house-stat-beds-v\d+\s*-->/g, "");
-    var houseStatTarget = '<p class="h-stat"><span>2,700 sq ft</span><span>3 bed, 3 bath</span><span>sleeps 8</span></p>';
+    var houseStatTarget = '<p class="h-stat"><span>2,700 sq ft</span><span>3 bedroom, 3 bath</span><span>sleeps 8</span></p>';
     var houseBlockRe = /(<section[^>]*id="house"[^>]*>[\s\S]*?)(<p class="h-stat">[\s\S]*?<\/p>)/i;
     if (houseBlockRe.test(html)) {
       html = html.replace(houseBlockRe, "$1" + houseStatTarget);
       changed = true;
     }
+    // Also rewrite any leftover shorter label if the full h-stat block was already present
+    html = html.replace(/(<p class="h-stat">[\s\S]*?<span>)3 bed, 3 bath(<\/span>)/i, "$13 bedroom, 3 bath$2");
     if (html.includes("</head>")) {
-      html = html.replace("</head>", "<!-- bh-house-stat-beds-v2 -->" + "</head>");
+      html = html.replace("</head>", "<!-- bh-house-stat-beds-v3 -->" + "</head>");
       changed = true;
     }
   }

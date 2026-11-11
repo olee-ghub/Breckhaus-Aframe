@@ -1,0 +1,16 @@
+
+/* 2026-11-04 item74b: Book Your Dates + Book Stay gone; sticky stays. TEST only. */
+#book,.section.stay,#book.bp74-gone{display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;margin:0!important;padding:0!important;border:0!important}
+#bp67-pbar,.bp67-pbar,#bp69-cancel,.bp67-nc,.bp71-pill,.bp71,.bp71-scrim{display:none!important}/* item80: nav Book CTA no longer hidden */
+html body.bp67-on,html body.bp67-on.has-book-bar{padding-bottom:0!important}
+html.bp71-lock,html.bp71-lock body{overflow:auto}
+html.bp71-push body>*{transform:none!important}
+@media (max-width:820px){.bp70-r{display:inline-flex!important;align-items:center;margin-left:8px;padding:10px 16px;font-size:12px}}
+/* item79b: hoist used to pin z-index at 320, BELOW mobile scrim (399), so date taps hit the
+   dim overlay and close the sheet (felt like bounce off booking / back to hero on phone). */
+#bp69-pop.bp74-hoist{z-index:420}
+#bp67-gp.bp74-hoist{z-index:421}
+@media (max-width:820px){
+  #bp69-pop.bp74-hoist{z-index:420}
+  .bp69-scrim.open{z-index:410}
+}

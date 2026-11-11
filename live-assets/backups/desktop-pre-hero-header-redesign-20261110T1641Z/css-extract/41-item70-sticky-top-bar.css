@@ -1,0 +1,13 @@
+
+/* item85: sticky Check-in/Checkout/Guests bar removed; header #header-reserve owns Reserve. */
+:root{--bp70-h:0px}
+#bp70,.bp70{display:none!important;height:0!important;overflow:hidden!important;pointer-events:none!important;visibility:hidden!important}
+nav .nav-end > a.btn-gold,#header-reserve{display:inline-flex!important;align-items:center}
+main section[id],#book{scroll-margin-top:var(--nav-h)}
+.anchor-alias{scroll-margin-top:calc(var(--nav-h) + 8px)}
+.gallery-group{scroll-margin-top:calc(var(--nav-h) + 3.2rem)}
+.gallery-filters{top:var(--nav-h)!important}
+@media (min-width:1280px){
+  .house-photos{top:calc(var(--nav-h) + 1.5rem)!important}
+  .house-shot{top:calc(var(--nav-h) + 1.5rem)}
+}

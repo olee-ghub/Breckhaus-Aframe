@@ -1,0 +1,26 @@
+
+/* 2026-11-04 (Oliver voice): Aman-style carousel per photo category, progress bar underneath. TEST only. */
+#gallery .gallery-group{margin-bottom:2.6rem}#gallery .gallery-group:last-child{margin-bottom:0}
+#gallery .gallery-group-title{margin-bottom:.9rem}
+#gallery .gc-track{--gh:clamp(240px,30vw,420px);display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding-inline:var(--pad);outline:none}
+#gallery .gc-track::-webkit-scrollbar{display:none}
+#gallery .gc-track:focus-visible{box-shadow:inset 0 0 0 1px var(--gold)}
+#gallery .gc-track>.shot{flex:0 0 auto;height:var(--gh)!important;width:auto!important;aspect-ratio:var(--ar,3/2);min-height:0!important;max-width:calc(100vw - 2*var(--pad) - 24px);scroll-snap-align:start;grid-column:auto!important;grid-row:auto!important;position:relative}
+#gallery .gc-track>.shot img{position:static!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;object-fit:cover!important}
+#gallery .gc-track>.shot:last-child{margin-right:var(--pad)}
+.gc-ctrl{display:flex;align-items:center;gap:14px;margin-top:1.1rem}
+.gc-bar{position:relative;flex:1 1 auto;height:1px;background:rgba(242,237,228,.18);overflow:hidden}
+.gc-fill{position:absolute;top:0;left:0;height:1px;width:10%;background:var(--gold);transition:transform .25s ease,width .25s ease;will-change:transform}
+.gc-count{flex:0 0 auto;min-width:4.2em;text-align:right;font-family:"Jost",system-ui,sans-serif;font-size:var(--fs-small,.745rem);letter-spacing:.16em;color:var(--bronze)}
+.gc-count b{font-weight:400;color:var(--cream)}
+.gc-btn{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(160,138,110,.55);background:transparent;color:var(--cream);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:border-color .2s,opacity .2s}
+.gc-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4}
+.gc-btn:hover:not(:disabled),.gc-btn:focus-visible{border-color:var(--gold)}
+.gc-btn:disabled{opacity:.3;cursor:default}
+@media (max-width:767px){
+ #gallery .gc-track{--gh:58vw;gap:10px}
+ #gallery .gallery-group{margin-bottom:2.1rem}
+ .gc-ctrl{gap:10px;margin-top:.9rem}
+ .gc-btn{width:34px;height:34px}
+}
+@media (prefers-reduced-motion:reduce){#gallery .gc-track{scroll-behavior:auto}.gc-fill{transition:none}}

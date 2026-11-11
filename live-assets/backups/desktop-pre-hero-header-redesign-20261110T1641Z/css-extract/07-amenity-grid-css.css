@@ -1,0 +1,7 @@
+
+  /* amenity grid rebalance 2026-11-03: fixed 90px label column, equal columns, one column when the list is under ~700px */
+  .amenity-list { grid-template-columns: minmax(0, 1fr); column-gap: 2.5rem; }
+  .amenity-list li { display: grid; grid-template-columns: 90px minmax(0, 1fr); column-gap: 1rem; align-items: baseline; padding: 0.75rem 0; overflow-wrap: anywhere; }
+  .amenity-list li > span:first-child { min-width: 0; }
+  /* two equal columns only when the list itself is at least ~700px wide */
+  @media (min-width: 700px) { .amenity-list { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); } }

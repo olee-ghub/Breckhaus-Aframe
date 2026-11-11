@@ -1,0 +1,36 @@
+
+    /* item 36: Exterior 8, Deck 7, Details 3 — balanced, no empty cells */
+    @media (min-width: 768px) {
+      #gallery-exterior .mosaic, #gallery-deck .mosaic, #gallery-details .mosaic { display: grid; grid-auto-rows: auto; grid-auto-flow: row; }
+      #gallery-exterior .mosaic > .shot, #gallery-deck .mosaic > .shot, #gallery-details .mosaic > .shot { position: relative; min-height: 0 !important; height: auto; grid-column: auto; grid-row: auto; }
+      #gallery-exterior .mosaic > .shot img, #gallery-deck .mosaic > .shot img, #gallery-details .mosaic > .shot img { width: 100%; height: auto !important; min-height: 0 !important; max-height: none !important; object-fit: cover !important; }
+      /* Exterior: wide hero, two pairs, then tall A-frame + two stacked */
+      #gallery-exterior .mosaic { grid-template-columns: 1fr 1fr; }
+      #gallery-exterior .mosaic > .shot img { aspect-ratio: 16 / 9 !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-01-exterior-01"] { grid-column: 1 / -1 !important; grid-row: 1 !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-01-exterior-01"] img { aspect-ratio: 16 / 9 !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-06b-exterior-09"] { grid-column: 1 !important; grid-row: 4 / span 2 !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-06b-exterior-09"] img { position: absolute; inset: 0; height: 100% !important; aspect-ratio: auto !important; object-position: 55% 40% !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-07-exterior-07"] { grid-column: 2 !important; grid-row: 4 !important; }
+      #gallery-exterior .mosaic > [data-slot="gallery-08b-exterior-10"] { grid-column: 2 !important; grid-row: 5 !important; }
+      /* Deck: 3 across, 2 across, then sauna portrait + sauna landscape */
+      #gallery-deck .mosaic { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+      #gallery-deck .mosaic > .s4 { grid-column: span 4 !important; }
+      #gallery-deck .mosaic > .s6 { grid-column: span 6 !important; }
+      #gallery-deck .mosaic > .s4 img { aspect-ratio: 383 / 325 !important; }
+      #gallery-deck .mosaic > .s6 img { aspect-ratio: 16 / 9 !important; }
+      #gallery-deck .mosaic > [data-slot="gallery-13b-deck-06"] { grid-column: 1 / span 4 !important; }
+      #gallery-deck .mosaic > [data-slot="gallery-13b-deck-06"] img { position: absolute; inset: 0; height: 100% !important; aspect-ratio: auto !important; object-position: 50% 55% !important; }
+      #gallery-deck .mosaic > [data-slot="gallery-13c-deck-07"] { grid-column: 5 / span 8 !important; }
+      /* Details: three across */
+      #gallery-details .mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1280px) {
+      #gallery-exterior .mosaic > [data-slot="gallery-01-exterior-01"] img { aspect-ratio: 32 / 9 !important; }
+      #gallery-details .mosaic > .shot img { aspect-ratio: 383 / 325 !important; }
+    }
+    @media (max-width: 767px) {
+      #gallery-exterior [data-slot="gallery-06b-exterior-09"] img { object-position: 55% 35% !important; }
+      #gallery-deck [data-slot="gallery-13b-deck-06"] img { object-position: 50% 55% !important; }
+    }
+  

@@ -1,0 +1,113 @@
+{
+  "stamp_utc": "20261110T1641Z",
+  "label": "desktop-pre-hero-header-redesign",
+  "source_url": "https://breckhaus-basecamp-test.leeoliver28.workers.dev/",
+  "purpose": "Full backup before moving Breckhaus/Breckenridge into header and simplifying/enlarging hero overlay text",
+  "files": {
+    "live_html": "index.live.html",
+    "nav_snippet": "nav.snippet.html",
+    "hero_snippet": "hero.snippet.html",
+    "css_extract_dir": "css-extract/",
+    "referenced_assets": "referenced-assets.txt"
+  },
+  "live_html_sha256": "e6b41a2e22743adce17b99d391054109d405f96b7c3b06c910bd7a714423407d",
+  "live_html_bytes": 233425,
+  "style_block_count": 47,
+  "key_style_ids": [
+    "style-00",
+    "basecamp-fit-css",
+    "basecamp-logo-css",
+    "bc-layout-v1",
+    "hero-mobile-css",
+    "hero-shift-css",
+    "hero-balance-css",
+    "amenity-grid-css",
+    "floor-cards-css",
+    "foot-license-css",
+    "contact-btn-css",
+    "rhythm-css",
+    "item30-stack-css",
+    "item35-sharp-css",
+    "item36-gallery-css",
+    "item37-amenity-css",
+    "item38-flyover-css",
+    "item39-hero-mobile-css",
+    "bh-text-crisp",
+    "bh-nav-taller",
+    "bh-nav-wordmark-lg",
+    "bh-hero-scrim-v1",
+    "bh-hero-read-veil-v1",
+    "bh-hero-pos-v1",
+    "bh-hero-text-sharp-v1",
+    "bh-nav-lockup-v1",
+    "bh-scrub-test-artifacts-v1",
+    "bh-dedupe-hero-loc-v2",
+    "bh-hero-loc-v2",
+    "bh-loc-color-v1",
+    "bh-nav-tabs-v31",
+    "bh-area-around-v2",
+    "item60-carousel",
+    "item62-font-consistency",
+    "item63-carousel-arrows",
+    "item64-carousel-compact",
+    "item64-footer-tighten",
+    "item68-book-heading",
+    "item66-flyover-cap",
+    "item67-booking-panel",
+    "item69-popup-picker",
+    "item70-sticky-top-bar",
+    "item71-bookstay-drawer",
+    "item72-category-carousels",
+    "item73-inpage-reserve",
+    "item74-remove-book-section",
+    "item82-hosp-shell"
+  ],
+  "hero_tag": "header.hero",
+  "asset_files": [
+    {
+      "path": "assets/logo-mark-nav.png",
+      "bytes": 3107
+    },
+    {
+      "path": "assets/logo.png",
+      "bytes": 102651
+    },
+    {
+      "path": "assets/logo-lockup.png",
+      "bytes": 282551
+    },
+    {
+      "path": "img/hero.jpg",
+      "bytes": 751848
+    },
+    {
+      "path": "img/hero-poster.jpg",
+      "bytes": 362442
+    },
+    {
+      "path": "fonts/jost-latin.woff2",
+      "bytes": 26576
+    },
+    {
+      "path": "fonts/playfair-display-italic-latin.woff2",
+      "bytes": 21884
+    },
+    {
+      "path": "fonts/cormorant-italic-latin.woff2",
+      "bytes": 39260
+    },
+    {
+      "path": "fonts/playfair-display-latin.woff2",
+      "bytes": 38404
+    },
+    {
+      "path": "fonts/cormorant-latin.woff2",
+      "bytes": 37640
+    }
+  ],
+  "locations": {
+    "repo": "live-assets/backups/desktop-pre-hero-header-redesign-20261110T1641Z/",
+    "artifacts": "/opt/cursor/artifacts/desktop-pre-hero-header-redesign-20261110T1641Z/",
+    "r2": "breckhaus-drone / site/backups/desktop-pre-hero-header-redesign-20261110T1641Z/"
+  }
+}

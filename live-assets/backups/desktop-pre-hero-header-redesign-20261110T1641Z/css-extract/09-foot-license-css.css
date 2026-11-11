@@ -1,0 +1,6 @@
+
+  .house .eyebrow + .h-stat { margin-top: 0.6rem; }
+  .layout .eyebrow + .floors { margin-top: 1.6rem; }
+  .area .eyebrow + .lede { margin-top: 0.5rem; }
+  .foot-bottom { font-size: 0.87rem; }
+  .foot-bottom > span, .foot-license { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; text-transform: none; }

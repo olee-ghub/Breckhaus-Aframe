@@ -1,0 +1,23 @@
+
+/* item 30: Bedrooms stacked layout at 768px+ - tall king-forest (uncropped 2:3) | two landscapes stacked | tall king-coffee */
+@media (min-width: 768px) {
+  #gallery-bedrooms .mosaic { display: grid; grid-template-columns: 8fr 9fr 9fr; grid-template-rows: auto auto; grid-auto-rows: auto; grid-auto-flow: row; }
+  #gallery-bedrooms .mosaic > .shot { position: relative; min-height: 0 !important; height: auto; aspect-ratio: auto; grid-column: auto; grid-row: auto; }
+  #gallery-bedrooms .mosaic > .shot img { position: absolute; inset: 0; width: 100%; height: 100% !important; min-height: 0 !important; max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-19-bedrooms-01"] { grid-column: 1 !important; grid-row: 1 / span 2 !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-19-bedrooms-01"] img { position: static; height: auto !important; aspect-ratio: 2 / 3 !important; object-position: 50% 50% !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-20-bedrooms-02"] { grid-column: 2 !important; grid-row: 1 !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-22-bedrooms-04"] { grid-column: 2 !important; grid-row: 2 !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-21-bedrooms-03"] { grid-column: 3 !important; grid-row: 1 / span 2 !important; }
+  #gallery-bedrooms .mosaic > [data-slot="gallery-21-bedrooms-03"] img { object-position: 50% 50% !important; }
+  /* Baths: two landscape tiles side by side, equal */
+  #gallery-baths .mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
+  #gallery-baths .mosaic > .shot { grid-column: auto !important; grid-row: auto !important; min-height: 0 !important; }
+  #gallery-baths .mosaic > .shot img { height: auto !important; aspect-ratio: 3 / 2 !important; max-height: none !important; min-height: 0 !important; }
+  /* item 49: five baths = 2 over 3 */
+  #gallery-baths .mosaic { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  #gallery-baths .mosaic > .shot { grid-column: span 2 !important; }
+  #gallery-baths .mosaic > .shot:nth-child(-n+2) { grid-column: span 3 !important; }
+  /* item 47: three soft bedroom shots as a full third row */
+  #gallery-bedrooms .mosaic > .shot.soft { grid-row: 3 !important; aspect-ratio: 3 / 2; }
+}

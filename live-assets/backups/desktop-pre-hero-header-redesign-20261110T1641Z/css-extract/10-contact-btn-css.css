@@ -1,0 +1,9 @@
+
+  .faq .eyebrow + .faq-list { margin-top: 1.1rem; }
+  .gallery-intro { margin-bottom: 0.9rem; }
+  .reviews-intro { margin-bottom: 1.1rem; }
+  .seasons .eyebrow + .season-grid { margin-top: 1.1rem; }
+  .contact .eyebrow + .lede { margin-top: 0.5rem; }
+  .contact-form #contact-submit.btn-gold { background: var(--charcoal); color: var(--cream) !important; border: 1px solid var(--charcoal); transition: border-color .2s ease, background-color .2s ease, color .2s ease; }
+  .contact-form #contact-submit.btn-gold:hover, .contact-form #contact-submit.btn-gold:focus-visible { background: #24231d; border-color: var(--gold); color: var(--cream) !important; }
+  .contact-form #contact-submit.btn-gold:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }

@@ -1,0 +1,6 @@
+
+  /* floor cards 2026-11-03: even text starts across cards */
+  .floor { display: flex; flex-direction: column; }
+  .floor h3 { line-height: 1.2; }
+  @media (min-width: 768px) { .floor h3 { min-height: 2.4em; } }
+  .floor p { font-size: 0.965rem; line-height: 1.65; }

@@ -1,0 +1,17 @@
+
+  /* hero text rhythm 2026-11-03 (item 25): even gaps eyebrow/H1/line 1/line 2; airy lede; line 1 wraps 768-1279 to clear the sauna, one line at 1280+ */
+  .hero .eyebrow { margin-bottom: 1rem; }
+  .hero h1 { margin-bottom: 1.15rem; }
+  .hero-lede { line-height: 1.5; margin-bottom: 1.5rem; }
+  .hero-lede .hl { display: block; }
+  .hero-lede .hl2 { margin-top: .4em; }
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .hero-lede { max-width: 38ch; }
+    .hero h1 { margin-bottom: 1.25rem; }
+  }
+  @media (min-width: 1280px) {
+    .hero .eyebrow { margin-bottom: 1.15rem; }
+    .hero h1 { margin-bottom: 1.4rem; }
+    .hero-lede { max-width: none; margin-bottom: 1.7rem; }
+    .hero-lede .hl1 { white-space: nowrap; }
+  }

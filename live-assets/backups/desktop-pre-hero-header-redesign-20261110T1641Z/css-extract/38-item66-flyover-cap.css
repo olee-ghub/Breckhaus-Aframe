@@ -1,0 +1,3 @@
+
+/* 2026-11-04 Oliver yes: desktop flyover capped at 60% of screen height, 16:9 kept; phone untouched */
+@media (min-width:821px){#flyover .flyover-frame{max-width:min(100%,calc(60vh * 16 / 9));margin-left:auto;margin-right:auto}}

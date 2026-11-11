@@ -1152,33 +1152,40 @@ async function maybeRewriteHtml(request, env, res) {
     changed = true;
   }
 
-  // bh-hero-tighten-v1: kill mobile 64%-media black band; shorter hero; softer fade; pull first section up
-  if (!html.includes("bh-hero-tighten-v1")) {
+  // bh-hero-tighten-v2: fill photo, cut black band, denser first screen + house copy
+  if (!html.includes("bh-hero-tighten-v2")) {
     html = html.replace(/<style id="bh-hero-tighten-v\d+"[\s\S]*?<\/style>/g, "");
-    var tightenCss = "<style id=\"bh-hero-tighten-v1\">"
+    var tightenCss = "<style id=\"bh-hero-tighten-v2\">"
       + ".hero{min-height:0!important}"
       + ".hero-media{height:100%!important;bottom:0!important;top:0!important;inset:0!important}"
-      + ".hero-media::after{height:18%!important;background:linear-gradient(to bottom,rgba(13,13,11,0) 0%,rgba(13,13,11,.42) 62%,var(--charcoal,#0d0d0b) 100%)!important}"
-      + ".hero-scrim{background:linear-gradient(to bottom,rgba(13,13,11,.06) 0%,rgba(13,13,11,.05) 55%,rgba(13,13,11,.22) 100%)!important}"
-      + "#house.section,.section.house{padding-top:1.6rem!important;padding-bottom:2.6rem!important}"
+      + ".hero-media::after{height:12%!important;background:linear-gradient(to bottom,rgba(13,13,11,0) 0%,rgba(13,13,11,.28) 55%,var(--charcoal,#0d0d0b) 100%)!important}"
+      + ".hero-scrim{background:linear-gradient(to bottom,rgba(13,13,11,.04) 0%,rgba(13,13,11,.04) 60%,rgba(13,13,11,.16) 100%)!important}"
+      + "#house.section,.section.house{padding-top:.7rem!important;padding-bottom:1.8rem!important}"
+      + "#house .h-stat,.section.house .h-stat{margin-top:0!important;margin-bottom:.55rem!important}"
+      + "#house .lede,.section.house .lede{margin-top:0!important;margin-bottom:.7rem!important;line-height:1.55!important}"
+      + "#house .amenity-list,.section.house .amenity-list{margin-top:.85rem!important}"
+      + "#house .amenity-list li,.section.house .amenity-list li{padding:.55rem 0!important;line-height:1.45!important}"
       + "@media (max-width:767px){"
-      + ".hero{min-height:68svh!important;min-height:68vh!important;max-height:74svh!important}"
+      + ".hero{min-height:58svh!important;min-height:58vh!important;max-height:64svh!important}"
       + ".hero-media{top:var(--nav-h,3.5rem)!important;height:auto!important;bottom:0!important}"
-      + ".hero-media::after{height:16%!important}"
-      + ".hero-inner{transform:translate(0,-1.5vh)!important}"
-      + "#house.section,.section.house{padding-top:1.25rem!important;padding-bottom:2.1rem!important}"
-      + ".section{padding-top:2.4rem!important;padding-bottom:2.4rem!important}"
+      + ".hero-media::after{height:10%!important}"
+      + ".hero-inner{transform:translate(0,-1vh)!important}"
+      + ".hero-lede{margin-top:.7rem!important}.hero-mins{margin-top:.2rem!important}"
+      + "#house.section,.section.house{padding-top:.45rem!important;padding-bottom:1.4rem!important}"
+      + ".section{padding-top:1.75rem!important;padding-bottom:1.75rem!important}"
+      + ".wrap{padding-left:1rem!important;padding-right:1rem!important}"
       + "}"
       + "@media (min-width:768px) and (max-width:1023px){"
-      + ".hero{min-height:74svh!important;min-height:74vh!important}"
+      + ".hero{min-height:66svh!important;min-height:66vh!important}"
       + ".hero-media{top:var(--nav-h,3.75rem)!important;height:auto!important;bottom:0!important}"
-      + ".hero-inner{transform:translate(-.5vw,-3vh)!important}"
+      + ".hero-inner{transform:translate(-.5vw,-2vh)!important}"
+      + "#house.section,.section.house{padding-top:.6rem!important;padding-bottom:1.6rem!important}"
       + "}"
       + "@media (min-width:1024px){"
-      + ".hero{min-height:86svh!important;min-height:86vh!important}"
+      + ".hero{min-height:82svh!important;min-height:82vh!important}"
       + ".hero-media{inset:0!important;height:auto!important}"
-      + ".hero-inner{transform:translate(-1vw,-6vh)!important}"
-      + "#house.section,.section.house{padding-top:2rem!important;padding-bottom:3rem!important}"
+      + ".hero-inner{transform:translate(-1vw,-5vh)!important}"
+      + "#house.section,.section.house{padding-top:1.1rem!important;padding-bottom:2.2rem!important}"
       + "}"
       + "</style>";
     if (html.includes("</head>")) { html = html.replace("</head>", tightenCss + "</head>"); changed = true; }

@@ -1637,9 +1637,9 @@ async function maybeRewriteHtml(request, env, res) {
       if (!m) return;
       var btn = m[0];
       var next = btn;
-      var newCap = "Lower level king en suite";
+      var newCap = "Lower level king en-suite";
       var newAlt = "Lower-level king suite with a brass dome lamp, wood nightstand, and an abstract print";
-      if (!/data-cap="Lower level king en suite"/.test(next)) {
+      if (!/data-cap="Lower level king en-suite"/.test(next)) {
         next = next.replace(/data-cap="[^"]*"/, 'data-cap="' + newCap + '"');
       }
       if (next.indexOf('alt="' + newAlt + '"') === -1) {
@@ -2670,20 +2670,21 @@ async function maybeRewriteHtml(request, env, res) {
       "img/bed-primary-bc58-3.jpg": "Primary King Suite",
       "img/bed-primary-bc58-4.jpg": "Primary King Suite",
       "img/bed-primary-bc58-5.jpg": "Primary King Suite",
-      "img/king-barn-bc72.jpg": "Lower level king en suite",
-      "img/bed-king2-bc58-1.jpg": "Lower level king en suite",
-      "img/bed-primary-bc58-8.jpg": "Lower level king en suite",
-      "img/bed-king2-bc58-2.jpg": "Lower level king en suite",
-      "img/bed-king2-bc58-4.jpg": "Lower level king en suite",
-      "img/bed-king2-bc58-3.jpg": "Lower level king en suite"
+      "img/bed-primary-bc58-7.jpg": "Primary coffee station",
+      "img/king-barn-bc72.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-1.jpg": "Lower level king en-suite",
+      "img/bed-primary-bc58-8.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-2.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-4.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-3.jpg": "Lower level king en-suite"
     };
     var bathPlan = [
       ["img/bath-primary-bc68.jpg", "Primary king suite bath"],
       ["img/bath-primary-bc58-1.jpg", "Primary king suite bath"],
       ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
-      ["img/bath-ensuite-bc68.jpg", "Lower level king en suite"],
-      ["img/bath-double.jpg", "Lower level king en suite"],
-      ["img/bath-ensuite-bc58-1.jpg", "Lower level king en suite"],
+      ["img/bath-ensuite-bc68.jpg", "Lower level king en-suite"],
+      ["img/bath-double.jpg", "Lower level king en-suite"],
+      ["img/bath-ensuite-bc58-1.jpg", "Lower level king en-suite"],
       ["img/bath-hall-bc68.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-1.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-2.jpg", "Hallway bath"]

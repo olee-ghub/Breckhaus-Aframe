@@ -2858,7 +2858,7 @@ var worker_default = {
         const body = await request.json();
         const key = String(body.key || "");
         const b64 = String(body.b64 || "");
-        if (!AREA_R2_KEYS.has(key) || !b64) return new Response(JSON.stringify({ ok:false, error:"bad_key" }), { status:400, headers:{ "content-type":"application/json" } });
+        if ((!AREA_R2_KEYS.has(key) && !GALLERY_R2_KEYS.has(key)) || !b64) return new Response(JSON.stringify({ ok:false, error:"bad_key" }), { status:400, headers:{ "content-type":"application/json" } });
         const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
         await env.DRONE.put(key, bin, { httpMetadata: { contentType: "image/jpeg" } });
         return new Response(JSON.stringify({ ok:true, key, size: bin.length }), { status:200, headers:{ "content-type":"application/json" } });

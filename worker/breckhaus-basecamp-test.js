@@ -198,6 +198,7 @@ const AREA_SCULPTURE_BTN = "<button data-slot=\"around-06-snow-sculpture\" class
 const AREA_TROLL_BTN = "<button data-slot=\"around-07-troll\" class=\"shot s4\" type=\"button\" data-full=\"img/area-troll.jpg?v=area1\" data-cap=\"Isak Heartstone Breckenridge Troll\"><img src=\"img/area-troll.jpg?v=area1\" alt=\"Wooden troll sculpture in the forest near Breckenridge\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_CYCLISTS_BTN = "<button data-slot=\"around-08-cyclists\" class=\"shot s4\" type=\"button\" data-full=\"img/area-cyclists.jpg?v=area1\" data-cap=\"biking\"><img src=\"img/area-cyclists.jpg?v=area1\" alt=\"Four cyclists on a paved mountain trail\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_R2_KEYS = new Set(["img/area-skier.jpg","img/area-snow-sculpture.jpg","img/area-troll.jpg","img/area-cyclists.jpg"]);
+const GALLERY_R2_KEYS = new Set(["img/bath-primary-robe.jpg","img/bath-public-goods.jpg","img/loft-stair-rail.jpg"]);
 function replaceBalancedOpenTag(html, openRe, replacement) {
   const m = openRe.exec(html);
   if (!m) return { html, changed: false };
@@ -2632,6 +2633,11 @@ async function maybeRewriteHtml(request, env, res) {
       var i = path.lastIndexOf("img/");
       return i >= 0 ? path.slice(i) : path;
     }
+    function retargetFile(btn, file) {
+      var next = btn.replace(/data-full="[^"]*"/, 'data-full="' + file + '"');
+      if (/src="/.test(next)) next = next.replace(/src="[^"]*"/, 'src="' + file + '"');
+      return next;
+    }
     function capOf(btn) {
       var m = /data-cap="([^"]*)"/.exec(btn);
       return m ? m[1] : "";
@@ -2687,7 +2693,7 @@ async function maybeRewriteHtml(request, env, res) {
       ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
       ["img/bath-ensuite-bc68.jpg", "Lower level king en-suite"],
       ["img/bath-double.jpg", "Lower level king en-suite"],
-      ["img/bath-ensuite-bc58-1.jpg", "Lower level king en-suite"],
+      ["img/bath-public-goods.jpg", "Lower level king en-suite"],
       ["img/bath-hall-bc68.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-1.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-2.jpg", "Hallway bath"]
@@ -2711,6 +2717,9 @@ async function maybeRewriteHtml(request, env, res) {
       var byFile = Object.create(null);
       btns.forEach(function (b) { byFile[fileOf(b)] = b; });
       if (!byFile[robeSrc]) byFile[robeSrc] = robeBtn;
+      if (byFile["img/bath-ensuite-bc58-1.jpg"] && !byFile["img/bath-public-goods.jpg"]) {
+        byFile["img/bath-public-goods.jpg"] = retargetFile(byFile["img/bath-ensuite-bc58-1.jpg"], "img/bath-public-goods.jpg");
+      }
       var used = Object.create(null);
       var ordered = [];
       bathPlan.forEach(function (row) {
@@ -2721,9 +2730,16 @@ async function maybeRewriteHtml(request, env, res) {
       });
       btns.forEach(function (b) {
         var f = fileOf(b);
+        if (f === "img/bath-ensuite-bc58-1.jpg") return;
         if (!used[f]) ordered.push(b);
       });
       return ordered;
+    });
+    next = rewriteGroup(next, "gallery-loft", function (btns) {
+      return btns.map(function (b) {
+        if (fileOf(b) !== "img/loft-west.jpg") return b;
+        return retargetFile(b, "img/loft-stair-rail.jpg");
+      });
     });
     next = rewriteGroup(next, "gallery-details", function (btns) {
       return btns.filter(function (b) {
@@ -2833,7 +2849,7 @@ var worker_default = {
 
     
     // Area mosaic images from R2
-    if (AREA_R2_KEYS.has(url.pathname.slice(1))) {
+    if (AREA_R2_KEYS.has(url.pathname.slice(1)) || GALLERY_R2_KEYS.has(url.pathname.slice(1))) {
       return serveR2Object(request, env, url.pathname.slice(1), "image/jpeg", "public, max-age=86400");
     }
     // Temp upload endpoint for area photos (test only)

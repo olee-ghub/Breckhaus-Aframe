@@ -2691,7 +2691,6 @@ async function maybeRewriteHtml(request, env, res) {
     ];
     var detailCaps = {
       "img/entry-hall-bc58.jpg": "Entryway",
-      "img/details-hallway-bc58-1.jpg": "Lower level hall",
       "img/laundry-bc58.jpg": "Laundry room",
       "img/garage-gear-bc58.jpg": "Garage adventure wall"
     };
@@ -2723,7 +2722,9 @@ async function maybeRewriteHtml(request, env, res) {
       return ordered;
     });
     next = rewriteGroup(next, "gallery-details", function (btns) {
-      return btns.map(function (b) {
+      return btns.filter(function (b) {
+        return fileOf(b) !== "img/details-hallway-bc58-1.jpg";
+      }).map(function (b) {
         var f = fileOf(b);
         if (!Object.prototype.hasOwnProperty.call(detailCaps, f)) return b;
         return withCap(b, detailCaps[f]);

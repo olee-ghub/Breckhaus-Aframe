@@ -2678,9 +2678,12 @@ async function maybeRewriteHtml(request, env, res) {
       "img/bed-king2-bc58-4.jpg": "Lower level king en-suite",
       "img/bed-king2-bc58-3.jpg": "Lower level king en-suite"
     };
+    var robeSrc = "img/bath-primary-robe.jpg";
+    var robeBtn = '<button style="--ar:1600/1067" data-slot="gallery-bath-primary-robe" class="shot s6" type="button" data-full="' + robeSrc + '" data-cap="Primary king suite bath">\n            <img src="' + robeSrc + '" alt="Primary bath with a waffle robe and folded towels on the wall, a toilet to the left, and a glass shower to the right" loading="lazy" decoding="async" />\n          </button>';
     var bathPlan = [
       ["img/bath-primary-bc68.jpg", "Primary king suite bath"],
       ["img/bath-primary-bc58-1.jpg", "Primary king suite bath"],
+      [robeSrc, "Primary king suite bath"],
       ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
       ["img/bath-ensuite-bc68.jpg", "Lower level king en-suite"],
       ["img/bath-double.jpg", "Lower level king en-suite"],
@@ -2707,6 +2710,7 @@ async function maybeRewriteHtml(request, env, res) {
     next = rewriteGroup(next, "gallery-baths", function (btns) {
       var byFile = Object.create(null);
       btns.forEach(function (b) { byFile[fileOf(b)] = b; });
+      if (!byFile[robeSrc]) byFile[robeSrc] = robeBtn;
       var used = Object.create(null);
       var ordered = [];
       bathPlan.forEach(function (row) {

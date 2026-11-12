@@ -1637,9 +1637,9 @@ async function maybeRewriteHtml(request, env, res) {
       if (!m) return;
       var btn = m[0];
       var next = btn;
-      var newCap = "Lower-level king bedside";
+      var newCap = "Lower level king en suite";
       var newAlt = "Lower-level king suite with a brass dome lamp, wood nightstand, and an abstract print";
-      if (!/data-cap="Lower-level king bedside"/.test(next)) {
+      if (!/data-cap="Lower level king en suite"/.test(next)) {
         next = next.replace(/data-cap="[^"]*"/, 'data-cap="' + newCap + '"');
       }
       if (next.indexOf('alt="' + newAlt + '"') === -1) {
@@ -2619,6 +2619,123 @@ async function maybeRewriteHtml(request, env, res) {
     html = html.replace(/<a([^>]*href="#house"[^>]*)>Basecamp<\/a>/g, "<a$1>The House</a>");
     html = html.replace(/<summary>Basecamp<\/summary>/g, "<summary>The House</summary>");
     if (html !== before) changed = true;
+  })();
+
+  // bh-gallery-cap-v282: bedroom, bath, and Around the home captions.
+  // Runs after v272–v277 so it wins over the older bedside caption.
+  // Ski / snowboard / dog-sled label font and color, scoped to these three groups.
+  (function () {
+    function fileOf(btn) {
+      var m = /data-full="([^"]+)"/.exec(btn) || /src="([^"]+)"/.exec(btn);
+      if (!m) return "";
+      var path = m[1].split("?")[0];
+      var i = path.lastIndexOf("img/");
+      return i >= 0 ? path.slice(i) : path;
+    }
+    function capOf(btn) {
+      var m = /data-cap="([^"]*)"/.exec(btn);
+      return m ? m[1] : "";
+    }
+    function withCap(btn, cap) {
+      var next = btn;
+      if (/data-cap="/.test(next)) next = next.replace(/data-cap="[^"]*"/, 'data-cap="' + cap + '"');
+      else next = next.replace(/<button\b/i, '<button data-cap="' + cap + '"');
+      if (/<span class="lbl">/.test(next)) next = next.replace(/(<span class="lbl">)[\s\S]*?(<\/span>)/, "$1" + cap + "$2");
+      else next = next.replace(/<\/button>\s*$/i, '<span class="lbl">' + cap + "</span></button>");
+      return next;
+    }
+    function buttonsOf(inner) {
+      var buttons = [];
+      var re = /<button\b[\s\S]*?<\/button>/gi;
+      var m;
+      while ((m = re.exec(inner))) buttons.push(m[0]);
+      return buttons;
+    }
+    function rewriteGroup(src, groupId, transformFn) {
+      var re = new RegExp('(<div[^>]*\\bid="' + groupId + '"[^>]*>[\\s\\S]*?<div class="gc-track"[^>]*>)([\\s\\S]*?)(</div>)', "i");
+      var m = src.match(re);
+      if (!m) return src;
+      var buttons = buttonsOf(m[2]);
+      var next = transformFn(buttons.slice());
+      if (!next) return src;
+      var inner = "\n          " + next.join("\n          ") + "\n          ";
+      var rebuilt = m[1] + inner + m[3];
+      if (rebuilt === m[0]) return src;
+      return src.replace(m[0], rebuilt);
+    }
+
+    var bedCaps = {
+      "img/bed-primary-bc58-1.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-2.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-3.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-4.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-5.jpg": "Primary King Suite",
+      "img/king-barn-bc72.jpg": "Lower level king en suite",
+      "img/bed-king2-bc58-1.jpg": "Lower level king en suite",
+      "img/bed-primary-bc58-8.jpg": "Lower level king en suite",
+      "img/bed-king2-bc58-2.jpg": "Lower level king en suite",
+      "img/bed-king2-bc58-4.jpg": "Lower level king en suite",
+      "img/bed-king2-bc58-3.jpg": "Lower level king en suite"
+    };
+    var bathPlan = [
+      ["img/bath-primary-bc68.jpg", "Primary king suite bath"],
+      ["img/bath-primary-bc58-1.jpg", "Primary king suite bath"],
+      ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
+      ["img/bath-ensuite-bc68.jpg", "Lower level king en suite"],
+      ["img/bath-double.jpg", "Lower level king en suite"],
+      ["img/bath-ensuite-bc58-1.jpg", "Lower level king en suite"],
+      ["img/bath-hall-bc68.jpg", "Hallway bath"],
+      ["img/bath-hall-bc58-1.jpg", "Hallway bath"],
+      ["img/bath-hall-bc58-2.jpg", "Hallway bath"]
+    ];
+    var detailCaps = {
+      "img/entry-hall-bc58.jpg": "Entryway",
+      "img/details-hallway-bc58-1.jpg": "Lower level hall",
+      "img/laundry-bc58.jpg": "Laundry room",
+      "img/garage-gear-bc58.jpg": "Garage adventure wall"
+    };
+
+    var next = html;
+    next = rewriteGroup(next, "gallery-bedrooms", function (btns) {
+      return btns.map(function (b) {
+        var f = fileOf(b);
+        var cap = Object.prototype.hasOwnProperty.call(bedCaps, f) ? bedCaps[f] : capOf(b);
+        if (!cap) return b;
+        return withCap(b, cap);
+      });
+    });
+    next = rewriteGroup(next, "gallery-baths", function (btns) {
+      var byFile = Object.create(null);
+      btns.forEach(function (b) { byFile[fileOf(b)] = b; });
+      var used = Object.create(null);
+      var ordered = [];
+      bathPlan.forEach(function (row) {
+        var b = byFile[row[0]];
+        if (!b) return;
+        used[row[0]] = 1;
+        ordered.push(withCap(b, row[1]));
+      });
+      btns.forEach(function (b) {
+        var f = fileOf(b);
+        if (!used[f]) ordered.push(b);
+      });
+      return ordered;
+    });
+    next = rewriteGroup(next, "gallery-details", function (btns) {
+      return btns.map(function (b) {
+        var f = fileOf(b);
+        if (!Object.prototype.hasOwnProperty.call(detailCaps, f)) return b;
+        return withCap(b, detailCaps[f]);
+      });
+    });
+    if (!next.includes('id="bh-gallery-cap-v282"') && next.includes("</head>")) {
+      var css = '<style id="bh-gallery-cap-v282">#gallery-bedrooms .shot .lbl,#gallery-baths .shot .lbl,#gallery-details .shot .lbl{display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;padding:1.4rem .7rem .55rem!important;background:linear-gradient(to top,rgba(13,13,11,.82),transparent)!important;font-size:.7rem!important;letter-spacing:.12em!important;text-transform:uppercase!important;color:var(--cream,#F2EDE4)!important;text-align:left!important;pointer-events:none!important;z-index:2!important}</style>';
+      next = next.replace("</head>", css + "</head>");
+    }
+    if (next !== html) {
+      html = next;
+      changed = true;
+    }
   })();
 
   // bh-tracking-v1: serve GA4 from js/tracking.js. Meta Pixel ID stays the placeholder.

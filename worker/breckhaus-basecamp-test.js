@@ -2693,8 +2693,8 @@ async function maybeRewriteHtml(request, env, res) {
       ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
       ["img/bath-ensuite-bc68.jpg", "Lower level king en-suite"],
       ["img/bath-double.jpg", "Lower level king en-suite"],
-      ["img/bath-public-goods.jpg", "Lower level king en-suite"],
       ["img/bath-hall-bc68.jpg", "Hallway bath"],
+      ["img/bath-public-goods.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-1.jpg", "Hallway bath"],
       ["img/bath-hall-bc58-2.jpg", "Hallway bath"]
     ];

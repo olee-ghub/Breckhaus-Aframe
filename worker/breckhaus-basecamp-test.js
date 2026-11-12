@@ -959,14 +959,14 @@ async function maybeRewriteHtml(request, env, res) {
 
 
 
-  // bh-compact-menu-v4: tablet/mobile = single Menu (links + Events + weather) + Reserve; desktop unchanged
-  if (!html.includes("bh-compact-menu-v4")) {
+  // bh-compact-menu-v5: tablet/mobile Menu + visible Events + temperature + Reserve; desktop unchanged
+  if (!html.includes("bh-compact-menu-v5")) {
     html = html.replace(/<style id="bh-tablet-menu-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-compact-menu-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<style id="bh-mobile-header-dense-v\d+"[\s\S]*?<\/style>/g, "");
     html = html.replace(/<script id="bh-tablet-menu-js"[\s\S]*?<\/script>/g, "");
     html = html.replace(/<script id="bh-compact-menu-js"[\s\S]*?<\/script>/g, "");
-    var cMenuCss = "<style id=\"bh-compact-menu-v4\">"
+    var cMenuCss = "<style id=\"bh-compact-menu-v5\">"
       + "@media (max-width:1023px){"
       + "header,nav,.nav-end{overflow:visible!important}"
       + "nav{display:flex!important;align-items:center!important;gap:.45rem!important;min-width:0!important}"
@@ -974,8 +974,8 @@ async function maybeRewriteHtml(request, env, res) {
       + ".nav-end{flex:1 1 auto!important;min-width:0!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:.35rem!important}"
       + ".nav-links,.nav-more,.bh-mnav{display:none!important;visibility:hidden!important;pointer-events:none!important}"
       + ".nav-end > a:not(#header-reserve):not(.btn-gold){display:none!important}"
-      /* Single Menu + Reserve on the bar; Events/weather stay in DOM but off-bar */
-      + ".bh-tmenu{position:relative!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;order:0!important;margin-right:auto!important;z-index:330!important}"
+      /* Menu left of Events/temperature/Reserve on the right cluster */
+      + ".bh-tmenu{position:relative!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;order:0!important;margin-right:0!important;z-index:330!important}"
       + ".bh-tmenu>summary{list-style:none!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:.3rem!important;min-height:2.25rem!important;padding:.35rem .62rem!important;border:1px solid rgba(242,237,228,.22)!important;border-radius:999px!important;background:rgba(20,20,16,.55)!important;color:var(--cream,#F2EDE4)!important;font-family:Jost,system-ui,sans-serif!important;font-size:.66rem!important;font-weight:500!important;letter-spacing:.08em!important;text-transform:uppercase!important;white-space:nowrap!important}"
       + ".bh-tmenu>summary::-webkit-details-marker{display:none}"
       + ".bh-tmenu>summary::after{content:\"\";display:inline-block;width:.42rem;height:.42rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);opacity:.75;margin-top:-.12rem}"
@@ -986,15 +986,16 @@ async function maybeRewriteHtml(request, env, res) {
       + ".bh-tmenu-sep{height:1px!important;margin:.35rem .35rem!important;background:rgba(242,237,228,.14)!important;flex:0 0 auto!important}"
       + ".bh-tmenu-panel .bh-tmenu-action{color:rgba(201,169,110,.95)!important;letter-spacing:.08em!important}"
       + "#header-reserve,nav .nav-end>a.btn-gold{flex:0 0 auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;order:3!important;margin-left:0!important;white-space:nowrap!important}"
-      /* Park Events + weather off the congested bar; panels open fixed under header */
-      + ".bh-ev,.bh-wx{position:fixed!important;top:calc(var(--nav-h,68px) + 6px)!important;right:10px!important;left:auto!important;width:0!important;height:0!important;margin:0!important;padding:0!important;overflow:visible!important;z-index:410!important;order:unset!important;flex:0 0 auto!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:none!important}"
-      + ".bh-ev-trigger,.bh-wx-trigger{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;clip:rect(0,0,0,0)!important}"
-      + ".bh-ev-panel,.bh-wx-panel{pointer-events:auto!important;position:fixed!important;top:calc(var(--nav-h,68px) + 8px)!important;right:10px!important;left:auto!important;width:min(22rem,calc(100vw - 20px))!important;max-height:min(70vh,28rem)!important}"
+      /* Keep Events + temperature triggers visible beside Menu (undo v4 1px clip hide) */
+      + ".bh-ev,.bh-wx{position:relative!important;top:auto!important;right:auto!important;left:auto!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;width:auto!important;height:auto!important;margin:0 .12rem!important;padding:0!important;overflow:visible!important;z-index:321!important;pointer-events:auto!important;flex:0 0 auto!important}"
+      + ".bh-ev{order:1!important}"
+      + ".bh-wx{order:2!important}"
+      + ".bh-ev-trigger,.bh-wx-trigger{position:relative!important;width:auto!important;height:auto!important;min-height:2.25rem!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important}"
       + "}"
       + "@media (min-width:768px) and (max-width:1023px){"
       + "nav{gap:.55rem!important}"
       + ".nav-end{gap:.4rem!important}"
-      + ".bh-tmenu{margin-right:auto!important}"
+      + ".bh-tmenu{margin-right:0!important}"
       + "#header-reserve,nav .nav-end>a.btn-gold{padding:.45rem .85rem!important;font-size:.7rem!important;min-height:2.25rem!important}"
       + "}"
       + "@media (max-width:767px){"
@@ -1004,7 +1005,6 @@ async function maybeRewriteHtml(request, env, res) {
       + ".bh-tmenu>summary{padding:.32rem .55rem!important;font-size:.62rem!important;min-height:2.25rem!important}"
       + "#header-reserve,nav .nav-end>a.btn-gold{padding:.4rem .7rem!important;font-size:.62rem!important;min-height:2.25rem!important}"
       + ".bh-tmenu-panel{min-width:12.5rem!important;max-height:min(68vh,26rem)!important}"
-      + ".bh-ev-panel,.bh-wx-panel{width:min(20rem,calc(100vw - 16px))!important;right:8px!important}"
       + "}"
       + "@media (min-width:1024px){.bh-tmenu{display:none!important}}"
       + "</style>";

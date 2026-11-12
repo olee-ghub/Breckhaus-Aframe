@@ -1,0 +1,21 @@
+
+  /* dead-zone pass 2026-11-03 (item 26): spacing only */
+  /* FAQ: last row's item padding added ~1rem extra below the list; trim so FAQ->next matches the section rhythm */
+  .faq { padding-bottom: calc(var(--rhythm) - 1rem); }
+  /* phones: one-column FAQ has no extra row padding to absorb, so keep the full rhythm (item 33) */
+  @media (max-width: 767px) { .faq { padding-bottom: var(--rhythm); } }
+  /* footer starts on the same rhythm as sections (was 2.75rem everywhere) */
+  footer { padding-top: var(--rhythm); }
+  /* tablets (2-col photo grid): fill the empty cell after a full-width lead photo instead of stretching an orphan */
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .mosaic > .shot:first-child.wide ~ .shot:last-child:nth-child(odd) { grid-column: auto; }
+    .mosaic > .shot:first-child.wide ~ .shot:last-child:nth-child(even) { grid-column: span 2; }
+    .mosaic > .shot:first-child.wide ~ .shot:last-child:nth-child(even) img { aspect-ratio: 16 / 9; }
+  }
+  /* FAQ strip (item 82): eight questions, 2 columns x 4 (column order) from 768px; 1 column on phones.
+     Was stuck on 6-item/3-row rules after cancellation + after/before FAQs were added. */
+  @media (min-width: 768px) {
+    .faq-list { grid-template-rows: repeat(4, auto); grid-auto-flow: column; }
+    .faq-item:nth-child(-n+2) { border-top: 0; }
+    .faq-item:nth-child(1), .faq-item:nth-child(5) { border-top: 1px solid var(--border); }
+  }

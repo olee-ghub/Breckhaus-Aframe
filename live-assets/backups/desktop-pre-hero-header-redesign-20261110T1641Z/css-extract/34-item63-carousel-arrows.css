@@ -1,0 +1,11 @@
+
+.rc{position:relative}
+.rc-controls{margin-top:1rem}
+.rc-btn{position:absolute;top:calc((100% - 2.75rem)/2);transform:translateY(-50%);z-index:2;background:rgba(24,24,22,.88)}
+.rc-btn:disabled{opacity:0;pointer-events:none}
+.rc-prev{left:-22px}.rc-next{right:-22px}
+@media (max-width:767px){
+ .rc-btn{width:34px;height:34px;font-size:1.3rem}
+ .rc-prev{left:-16px}.rc-next{right:-16px}
+ .rc-track>.review{padding-left:2rem!important;padding-right:2rem!important}
+}

@@ -1,0 +1,5 @@
+
+  @media (max-width: 767px) {
+    .hero-photo { object-position: var(--mh-pos39, 54% 50%); }
+  }
+    /* item 57: contact scroll room */ #contact { min-height: calc(100vh - var(--nav-h) - 260px); min-height: calc(100svh - var(--nav-h) - 260px); }

@@ -1,0 +1,11 @@
+/* Backup of brightened hero scrim (bh-hero-scrim-v1) before readability veil */
+/* Restore by injecting this style id again */
+
+.hero-scrim{
+  background: linear-gradient(to bottom,
+    rgba(13,13,11,0.1152) 0%,
+    rgba(13,13,11,0.09216) 38%,
+    rgba(13,13,11,0.24192) 68%,
+    rgba(13,13,11,0.44928) 100%) !important;
+}
+

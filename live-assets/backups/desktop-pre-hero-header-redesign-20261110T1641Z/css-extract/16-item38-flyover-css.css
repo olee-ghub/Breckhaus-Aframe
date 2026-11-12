@@ -1,0 +1,7 @@
+
+  .flyover-frame { width: 100%; max-width: 1240px; }
+  .flyover-frame video { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+  @media (max-width: 599px) {
+    .flyover-frame { width: auto; max-width: none; margin-left: calc(-1 * var(--pad)); margin-right: calc(-1 * var(--pad)); border-radius: 0; border-left: 0; border-right: 0; align-self: stretch; }
+    .flyover-frame video { border-radius: 0; }
+  }

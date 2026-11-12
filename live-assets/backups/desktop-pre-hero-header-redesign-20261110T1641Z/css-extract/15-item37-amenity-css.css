@@ -1,0 +1,8 @@
+
+    /* item 37: 6 amenities, clean label/text separation */
+    .amenity-list .amen-sep { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: pre; }
+    .amenity-list li > .amen-label { position: relative; }
+    .amenity-list li span.amen-text { color: inherit; font-size: inherit; letter-spacing: normal; text-transform: none; min-width: 0; }
+    .amenity-list li { grid-template-columns: 152px minmax(0, 1fr); }
+    @media (max-width: 479px), (min-width: 700px) and (max-width: 999px) { .amenity-list li { grid-template-columns: minmax(0, 1fr); row-gap: .2rem; align-content: start; } }
+  

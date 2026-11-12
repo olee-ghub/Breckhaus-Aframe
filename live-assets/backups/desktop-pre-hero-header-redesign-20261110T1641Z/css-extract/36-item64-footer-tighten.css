@@ -1,0 +1,7 @@
+
+/* 2026-11-04 Oliver yes: footer links match header nav size; tighter footer rhythm; bottom line unchanged */
+footer .foot-links a{font-size:13.52px!important;letter-spacing:.14em!important;min-height:36px}
+footer .foot-logo{margin-bottom:1.1rem}
+footer .foot-name{margin-bottom:.6rem}
+footer .foot-links{margin-bottom:1rem;row-gap:0}
+@media (max-width:767px){footer .foot-logo{margin-bottom:1rem}}

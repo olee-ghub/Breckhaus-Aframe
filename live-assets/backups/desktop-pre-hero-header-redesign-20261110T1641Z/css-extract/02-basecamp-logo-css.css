@@ -1,0 +1,60 @@
+
+    /* LOGO SLOT (Base Camp page only). Swap = replace assets/logo.png. PLACEHOLDER: Q1.
+       --logo-zoom/--logo-shift crop Q1's printed wordmark out of the small badge; set both to 1 / 0% for a plain mark. */
+    :root { --logo-zoom: 1; --logo-shift: 0%; }
+    .nav-logo.has-mark { flex-direction: row; align-items: center; gap: 0.7rem; }
+    .nav-logo .nav-text { display: flex; flex-direction: column; justify-content: center; gap: 0.12rem; min-width: 0; }
+    .nav-mark { flex: 0 0 auto; width: 68px; height: 62px; border-radius: 50%; overflow: hidden; background: #000;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.25); display: block; }
+    .nav-mark img { width: 100%; height: 100%; object-fit: contain; display: block;
+      transform: scale(var(--logo-zoom)) translateY(var(--logo-shift)); }
+    @media (max-width: 767px) { .nav-mark { width: 54px; height: 50px; } .nav-logo.has-mark { gap: 0.55rem; } }
+    @media (max-width: 480px) {
+      .nav-mark { width: 48px; height: 44px; }
+      .nav-logo.has-mark { gap: 0.45rem; }
+      .nav-logo.has-mark .nav-eyebrow { font-size: 0.6rem; letter-spacing: 0.2em; }
+      .nav-logo.has-mark .nav-wordmark { font-size: 1.15rem; }
+    }
+    @media (max-width: 430px) {
+      .nav-mark { width: 44px; height: 40px; }
+      .nav-logo.has-mark { gap: 0.4rem; }
+      .nav-logo.has-mark .nav-eyebrow { font-size: 0.55rem; letter-spacing: 0.14em; }
+      .nav-logo.has-mark .nav-wordmark { font-size: 1rem; }
+    }
+    @media (max-width: 400px) {
+      .nav-mark { width: 42px; height: 38px; }
+      .nav-logo.has-mark .nav-eyebrow { display: none; }
+      .nav-logo.has-mark .nav-wordmark { font-size: 0.98rem; }
+    }
+    /* TEST badge: sit above the sticky book bar so it never covers its text */
+    .photo-set-label { bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important; }
+    .anchor-alias { display:block; height:0; scroll-margin-top: calc(var(--nav-h) + 8px); }
+    #book { scroll-margin-top: var(--nav-h); }
+    /* no text on photos 2026-11-03: overlay labels removed from markup; lightbox caption hidden */
+    .shot .lbl, .shot figcaption, .place-card-img .place-n, .lb-cap { display: none !important; }
+    /* carousel corner labels */
+    #gallery .gc-track > .shot > .photo-label {
+      position: absolute;
+      z-index: 2;
+      left: 0.65rem;
+      bottom: 0.55rem;
+      pointer-events: none;
+      font-family: "Jost", system-ui, sans-serif;
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: rgba(13, 13, 11, 0.46);
+      padding: 0.32rem 0.5rem 0.28rem;
+      line-height: 1;
+    }
+    /* house kitchen photo 2026-11-03 */
+    .house-photos .house-shot--kitchen { margin-top: 1rem; }
+    @media (min-width: 1280px) {
+      .house-photos { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+      .house-photos .house-shot { position: static; }
+    }
+    /* footer lockup 2026-11-03 (line-art logo) */
+    .foot-logo { display: block; width: 180px; height: auto; margin: 0 auto 1.75rem; }
+    @media (max-width: 767px) { .foot-logo { width: 130px; margin-bottom: 1.5rem; } }

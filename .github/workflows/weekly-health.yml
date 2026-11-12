@@ -1,0 +1,705 @@
+# Monitoring only. Requests the live site and writes $GITHUB_STEP_SUMMARY.
+# No secrets, no deploy, and no notification into the Cursor project chat.
+# The cron expression is UTC.
+
+name: Weekly site health
+
+on:
+  schedule:
+    # GitHub Actions cron is always UTC.
+    # Monday 14:00 UTC is 7:00 AM Mountain Standard Time
+    # (America/Denver in winter) and 8:00 AM Mountain Daylight Time.
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    name: Live site health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check apex, www, booking, analytics, and hero media
+        shell: bash
+        run: |
+          python3 - << 'PY'
+          #!/usr/bin/env python3
+          """Live weekly health check for breckhausaframe.com.
+
+          GitHub Actions cron is UTC. This job is scheduled Monday 14:00 UTC,
+          which is 7:00 AM Mountain Standard Time (America/Denver in winter)
+          and 8:00 AM Mountain Daylight Time.
+
+          Monitoring only: no deploy, no secrets, no site edits. Results are
+          written to $GITHUB_STEP_SUMMARY. This job cannot post to chat.
+          """
+
+          from __future__ import annotations
+
+          import os
+          import re
+          import subprocess
+          import tempfile
+          from dataclasses import dataclass
+          from html import unescape
+          from urllib.parse import urljoin, urlparse
+
+          UA = (
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 "
+              "BreckhausWeeklyHealth/1.0"
+          )
+          APEX = "https://breckhausaframe.com"
+          WWW = "https://www.breckhausaframe.com"
+          MEDIA_ORIGIN = "https://media.breckhausaframe.com"
+          BOOKING_LABELS = ("check availability", "book direct", "reserve", "book a stay")
+
+
+          @dataclass
+          class Fetch:
+              url: str
+              status: int
+              final_url: str
+              redirects: int
+              content_type: str
+              headers: str
+              body: str
+              error: str
+
+
+          def request(
+              url: str,
+              *,
+              follow: bool = True,
+              method: str = "GET",
+              max_filesize: int | None = None,
+          ) -> Fetch:
+              header_path = tempfile.mkstemp(prefix="bh-hdr-")[1]
+              body_path = tempfile.mkstemp(prefix="bh-body-")[1]
+              cmd = [
+                  "curl",
+                  "-sS",
+                  "--max-redirs",
+                  "5",
+                  "--max-time",
+                  "45",
+                  "--connect-timeout",
+                  "15",
+                  "-A",
+                  UA,
+                  "-D",
+                  header_path,
+                  "-o",
+                  body_path,
+              ]
+              if follow:
+                  cmd.append("-L")
+              if method == "GET":
+                  cmd.append("--compressed")
+              if method == "HEAD":
+                  cmd.append("-I")
+              if max_filesize is not None and method != "HEAD":
+                  cmd.extend(["--max-filesize", str(max_filesize)])
+              cmd.extend(
+                  [
+                      "-w",
+                      "%{http_code}\n%{url_effective}\n%{num_redirects}\n%{content_type}",
+                      url,
+                  ]
+              )
+              try:
+                  proc = subprocess.run(cmd, capture_output=True, text=True)
+                  stdout = proc.stdout or ""
+                  lines = stdout.splitlines()
+                  status = int(lines[0]) if lines and lines[0].isdigit() else 0
+                  final_url = lines[1].strip() if len(lines) > 1 else ""
+                  redirects = int(lines[2]) if len(lines) > 2 and lines[2].isdigit() else 0
+                  content_type = lines[3].strip() if len(lines) > 3 else ""
+                  headers = _read(header_path)
+                  body = "" if method == "HEAD" else _read(body_path)
+                  if not content_type:
+                      content_type = _header_value(headers, "content-type")
+                  error = ""
+                  if proc.returncode != 0 and status == 0:
+                      error = (proc.stderr or f"curl exited {proc.returncode}").strip()
+                  return Fetch(url, status, final_url, redirects, content_type, headers, body, error)
+              finally:
+                  for path in (header_path, body_path):
+                      try:
+                          os.remove(path)
+                      except OSError:
+                          pass
+
+
+          def _read(path: str) -> str:
+              with open(path, "rb") as handle:
+                  return handle.read().decode("utf-8", errors="replace")
+
+
+          def _header_blocks(headers: str) -> list[str]:
+              text = headers.strip()
+              if not text:
+                  return []
+              return re.split(r"(?:\r?\n){2}(?=HTTP/)", text)
+
+
+          def _header_value(headers: str, name: str) -> str:
+              blocks = _header_blocks(headers)
+              blob = blocks[-1] if blocks else headers
+              match = re.search(rf"(?im)^{re.escape(name)}:\s*(.+)$", blob)
+              return match.group(1).strip() if match else ""
+
+
+          def is_challenge(headers: str, body: str) -> bool:
+              """True for a Cloudflare interstitial.
+
+              A successful page on this site still contains Cloudflare's routine
+              /cdn-cgi/challenge-platform/scripts/jsd/ beacon. That beacon is not
+              the "Just a moment" challenge page, so it does not fail the check.
+              """
+              for block in _header_blocks(headers) or [headers]:
+                  if re.search(r"(?im)^cf-mitigated:\s*.*challenge", block):
+                      return True
+              lowered = body.lower()
+              markers = (
+                  "just a moment",
+                  "cf-browser-verification",
+                  "cf-challenge-running",
+                  "challenge-running",
+                  "enable javascript and cookies to continue",
+                  "checking your browser before accessing",
+                  "/cdn-cgi/challenge-platform/h/",
+                  'id="challenge-form"',
+                  "id='challenge-form'",
+              )
+              return any(marker in lowered for marker in markers)
+
+
+          def page_title(body: str) -> str:
+              match = re.search(r"<title[^>]*>(.*?)</title>", body, re.I | re.S)
+              if not match:
+                  return ""
+              text = re.sub(r"<[^>]+>", " ", match.group(1))
+              return re.sub(r"\s+", " ", unescape(text)).strip()
+
+
+          def is_apex_url(url: str) -> bool:
+              parsed = urlparse(url)
+              return (
+                  parsed.scheme == "https"
+                  and parsed.netloc.lower() == "breckhausaframe.com"
+                  and parsed.path in ("", "/")
+                  and not parsed.query
+                  and not parsed.fragment
+              )
+
+
+          def real_page_problem(fetched: Fetch) -> str:
+              if fetched.error and fetched.status == 0:
+                  return f"connection failure: {fetched.error}"
+              if fetched.status != 200:
+                  return f"HTTP {fetched.status or 'none'}, expected 200"
+              if is_challenge(fetched.headers, fetched.body):
+                  return 'Cloudflare challenge (body contains "Just a moment" or a challenge page)'
+              title = page_title(fetched.body)
+              if "breckhaus" not in title.lower():
+                  return f"HTML is not the real page (title: {title or 'missing'})"
+              if "html" not in fetched.content_type.lower() and "<title" not in fetched.body[:4000].lower():
+                  return f"response is not HTML ({fetched.content_type or 'unknown type'})"
+              return ""
+
+
+          def strip_comments(html: str) -> str:
+              return re.sub(r"<!--.*?-->", "", html, flags=re.S)
+
+
+          def booking_controls(html: str) -> list[tuple[str, str]]:
+              found: list[tuple[str, str]] = []
+              cleaned = strip_comments(html)
+              for match in re.finditer(r"<(a|button)\b([^>]*)>(.*?)</\1>", cleaned, re.I | re.S):
+                  text = re.sub(r"<[^>]+>", " ", match.group(3))
+                  text = re.sub(r"\s+", " ", unescape(text)).strip()
+                  if text.lower() not in BOOKING_LABELS:
+                      continue
+                  href_match = re.search(r"""\bhref\s*=\s*(['"])(.*?)\1""", match.group(2), re.I | re.S)
+                  href = unescape(href_match.group(2).strip()) if href_match else ""
+                  found.append((text, href))
+              return found
+
+
+          def normalize_target(href: str) -> str:
+              absolute = urljoin(APEX + "/", href.strip())
+              parsed = urlparse(absolute)
+              path = parsed.path or "/"
+              if path != "/" and path.endswith("/"):
+                  path = path[:-1]
+              query = f"?{parsed.query}" if parsed.query else ""
+              return f"{parsed.scheme}://{parsed.netloc.lower()}{path}{query}"
+
+
+          def widget_key(url: str) -> str:
+              parsed = urlparse(url)
+              return f"{parsed.scheme}://{parsed.netloc.lower()}{parsed.path.rstrip('/')}"
+
+
+          def widget_urls(html: str) -> list[str]:
+              found = re.findall(
+                  r"https://booking\.hospitable\.com/widget/[A-Za-z0-9_-]+/\d+(?:\?[^\s\"'<>\\)]*)?",
+                  html,
+                  re.I,
+              )
+              if found:
+                  return _unique(unescape(url) for url in found)
+              site = re.search(r"\bSITE\s*=\s*['\"]([A-Za-z0-9_-]+)['\"]", html)
+              prop = re.search(r"\bPROP\s*=\s*['\"](\d+)['\"]", html)
+              if site and prop and "booking.hospitable.com/widget" in html:
+                  base = f"https://booking.hospitable.com/widget/{site.group(1)}/{prop.group(1)}"
+                  if "theme=boutique" in html:
+                      return [base + "?theme=boutique"]
+                  return [base]
+              return []
+
+
+          def choose_widget(urls: list[str]) -> str:
+              themed = [url for url in urls if "theme=" in urlparse(url).query]
+              return themed[0] if themed else urls[0]
+
+
+          def _unique(values) -> list[str]:
+              seen: set[str] = set()
+              ordered: list[str] = []
+              for value in values:
+                  if value in seen:
+                      continue
+                  seen.add(value)
+                  ordered.append(value)
+              return ordered
+
+
+          def strip_data_uris(html: str) -> str:
+              return re.sub(
+                  r"data:[a-z0-9.+-]+/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+",
+                  "",
+                  html,
+                  flags=re.I,
+              )
+
+
+          def tracking_report(html: str) -> tuple[list[str], list[str], list[str]]:
+              stripped = strip_data_uris(html)
+              meta: list[str] = []
+              if re.search(r"\bfbq\s*\(", stripped):
+                  meta.append("fbq()")
+              if re.search(r"fbevents", stripped, re.I):
+                  meta.append("fbevents")
+              if "META_PIXEL_ID" in stripped:
+                  meta.append("META_PIXEL_ID placeholder")
+              if re.search(r"connect\.facebook\.net", stripped, re.I):
+                  meta.append("connect.facebook.net")
+              ga: list[str] = []
+              if re.search(r"\bgtag\s*\(", stripped):
+                  ga.append("gtag()")
+              if re.search(r"googletagmanager\.com/gtag", stripped, re.I):
+                  ga.append("googletagmanager.com/gtag")
+              scriptish = "\n".join(re.findall(r"<script\b.*?</script>", stripped, re.I | re.S))
+              scriptish += "\n" + "\n".join(re.findall(r"<noscript\b.*?</noscript>", stripped, re.I | re.S))
+              ids = _unique(re.findall(r"\bG-[A-Z0-9]{8,12}\b", scriptish))
+              if ids:
+                  ga.append("measurement id " + ", ".join(ids))
+              broken: list[str] = []
+              for match in re.finditer(r"<script\b([^>]*)>", stripped, re.I):
+                  attrs = match.group(1)
+                  if not re.search(r"\bsrc\s*=", attrs, re.I):
+                      continue
+                  src = re.search(
+                      r"""\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]*))""",
+                      attrs,
+                      re.I,
+                  )
+                  value = ""
+                  if src:
+                      value = next(group for group in src.groups() if group is not None)
+                  if value.strip() == "":
+                      broken.append(re.sub(r"\s+", " ", match.group(0))[:180])
+              return meta, ga, broken
+
+
+          def to_media_host(src: str) -> str:
+              raw = unescape(src.strip())
+              if raw.startswith("//"):
+                  raw = "https:" + raw
+              parsed = urlparse(raw)
+              if parsed.scheme in ("http", "https"):
+                  query = f"?{parsed.query}" if parsed.query else ""
+                  path = parsed.path or "/"
+                  return f"{MEDIA_ORIGIN}{path}{query}"
+              return urljoin(MEDIA_ORIGIN + "/", raw)
+
+
+          def hero_media_targets(html: str) -> tuple[list[str], str, bool]:
+              """Return URLs, a summary note, and whether this is only the host root."""
+              cleaned = strip_comments(html)
+              absolute = _unique(
+                  unescape(match.group(0))
+                  for match in re.finditer(
+                      r"https?://media\.breckhausaframe\.com[^\s\"'<>]*",
+                      cleaned,
+                      re.I,
+                  )
+              )
+              files = [url for url in absolute if urlparse(url).path not in ("", "/")]
+              if files:
+                  return files, "Homepage names these media.breckhausaframe.com files.", False
+              srcs: list[str] = []
+              for video in re.findall(r"<video\b[^>]*>.*?</video>", cleaned, re.I | re.S):
+                  for match in re.finditer(
+                      r"""<(?:source|video)\b[^>]*\bsrc\s*=\s*(['"])(.*?)\1""",
+                      video,
+                      re.I | re.S,
+                  ):
+                      srcs.append(unescape(match.group(2).strip()))
+              srcs = _unique(srcs)
+              if srcs:
+                  resolved = [to_media_host(src) for src in srcs]
+                  note = (
+                      "Homepage drone video is referenced as "
+                      + ", ".join(srcs)
+                      + ". No media.breckhausaframe.com file is in the HTML, so those paths "
+                      "were requested on https://media.breckhausaframe.com."
+                  )
+                  return _unique(resolved), note, False
+              return (
+                  [MEDIA_ORIGIN + "/"],
+                  "No specific media file is in the homepage HTML. Requested the media host root.",
+                  True,
+              )
+
+
+          def is_media_type(content_type: str) -> bool:
+              base = content_type.split(";", 1)[0].strip().lower()
+              return base.startswith(("video/", "audio/", "image/")) or base in {
+                  "application/octet-stream",
+                  "application/mp4",
+                  "application/vnd.apple.mpegurl",
+                  "application/x-mpegurl",
+              }
+
+
+          def check_media(url: str, root_only: bool) -> tuple[str, str]:
+              """Return (summary line, failure or empty)."""
+              head = request(url, follow=True, method="HEAD")
+              if head.error and head.status == 0:
+                  return f"`{url}` connection failure: {head.error}", head.error
+              if head.status in (200, 206, 304) and is_media_type(head.content_type) and not is_challenge(head.headers, ""):
+                  line = (
+                      f"`{url}` returned HTTP {head.status} "
+                      f"({head.content_type or 'media'}), not a Cloudflare challenge."
+                  )
+                  return line, ""
+              # HEAD was inconclusive (HTML, 404, or a non-media status). Fetch a
+              # bounded body so a challenge page can be told from a normal response.
+              got = request(url, follow=True, method="GET", max_filesize=400_000)
+              if got.error and got.status == 0:
+                  return f"`{url}` connection failure: {got.error}", got.error
+              ctype_now = got.content_type or head.content_type
+              body_for_challenge = got.body if "html" in ctype_now.lower() or got.body.lstrip().startswith("<") else ""
+              if is_challenge(got.headers, body_for_challenge):
+                  detail = f"`{url}` is a Cloudflare challenge page (HTTP {got.status or head.status})."
+                  return detail, detail
+              status = got.status or head.status
+              ctype = got.content_type or head.content_type
+              if status in (200, 206, 304) and is_media_type(ctype):
+                  line = f"`{url}` returned HTTP {status} ({ctype}), not a Cloudflare challenge."
+                  return line, ""
+              title = page_title(got.body)
+              if root_only:
+                  line = (
+                      f"`{url}` returned HTTP {status}"
+                      + (f" ({ctype})" if ctype else "")
+                      + (f", title {title!r}" if title else "")
+                      + ". No specific file was referenced. The response is not a "
+                      "Cloudflare challenge, so the host-root probe passes."
+                  )
+                  return line, ""
+              detail = (
+                  f"`{url}` returned HTTP {status}"
+                  + (f" ({ctype})" if ctype else "")
+                  + ", which is not a 200 or a normal media response."
+              )
+              return detail, detail
+
+
+          def check_apex(lines: list[str], failures: list[str]) -> Fetch | None:
+              lines.append("## Apex")
+              lines.append("")
+              fetched = request(APEX + "/", follow=True)
+              problem = real_page_problem(fetched)
+              title = page_title(fetched.body)
+              if problem:
+                  failures.append(f"Apex: {problem}")
+                  lines.append(f"- https://breckhausaframe.com failed: {problem}")
+              else:
+                  final = fetched.final_url or APEX + "/"
+                  if not is_apex_url(final):
+                      failures.append(f"Apex final URL was {final}, expected https://breckhausaframe.com/")
+                      lines.append(f"- Final URL `{final}` is not https://breckhausaframe.com/.")
+                  else:
+                      lines.append(
+                          f"- HTTP {fetched.status} at `{final}`. Title: {title}. "
+                          "Real Breckhaus HTML, not a Cloudflare challenge."
+                      )
+              lines.append("")
+              return fetched
+
+
+          def check_www(lines: list[str], failures: list[str], apex: Fetch | None) -> None:
+              lines.append("## www")
+              lines.append("")
+              fetched = request(WWW + "/", follow=True)
+              if fetched.error and fetched.status == 0:
+                  failures.append(f"www: connection failure: {fetched.error}")
+                  lines.append(f"- Connection failure: {fetched.error}")
+                  lines.append("")
+                  return
+              if fetched.redirects > 0:
+                  final = fetched.final_url
+                  if not is_apex_url(final):
+                      failures.append(
+                          f"www redirected {fetched.redirects} time(s) to {final or 'an unknown URL'}, "
+                          "expected final URL https://breckhausaframe.com/"
+                      )
+                      lines.append(f"- Redirected to `{final}` instead of https://breckhausaframe.com/.")
+                  elif fetched.status != 200:
+                      failures.append(f"www final status was {fetched.status}, expected 200")
+                      lines.append(f"- Final status HTTP {fetched.status}, expected 200.")
+                  else:
+                      problem = real_page_problem(fetched)
+                      if problem:
+                          failures.append(f"www: {problem}")
+                          lines.append(f"- Followed the redirect, then failed: {problem}")
+                      else:
+                          lines.append(
+                              f"- Redirected to `{final}` and the final response was HTTP 200 "
+                              f"with title {page_title(fetched.body)!r}."
+                          )
+                  lines.append("")
+                  return
+              problem = real_page_problem(fetched)
+              if problem:
+                  failures.append(f"www: {problem}")
+                  lines.append(f"- No redirect, and the direct response failed: {problem}")
+                  lines.append("")
+                  return
+              www_title = page_title(fetched.body)
+              apex_title = page_title(apex.body) if apex and apex.body else ""
+              lines.append(
+                  "- No redirect. HTTP 200 with the real Breckhaus HTML. "
+                  "www serves the page directly, so this check does not fail for the missing redirect."
+              )
+              if apex_title and www_title != apex_title:
+                  failure = (
+                      f"www title {www_title!r} does not match the apex title {apex_title!r}"
+                  )
+                  failures.append(f"www: {failure}")
+                  lines.append(f"- {failure}")
+              else:
+                  lines.append(f"- Title matches the apex page: {www_title}.")
+              lines.append("")
+
+
+          def check_booking(lines: list[str], failures: list[str], html: str) -> None:
+              lines.append("## Booking")
+              lines.append("")
+              controls = booking_controls(html)
+              if not controls:
+                  failure = (
+                      "No Check Availability, Book Direct, Reserve, or Book a stay control was found."
+                  )
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+                  lines.append("")
+                  return
+              labels = _unique(label for label, _href in controls)
+              lines.append("- Labels found: " + ", ".join(labels) + ".")
+              expected = {"check availability", "book direct"}
+              if {label.lower() for label in labels} != expected:
+                  lines.append(
+                      "- Those labels differ from Check Availability and Book Direct. "
+                      "The live labels above are what this run checked."
+                  )
+              hrefs = [href for _label, href in controls]
+              missing = [label for label, href in controls if not href]
+              if missing:
+                  failure = "Booking control has no href: " + ", ".join(missing)
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+              norms = [normalize_target(href) for href in hrefs if href]
+              shared = ""
+              if norms and len(set(norms)) == 1:
+                  shared = norms[0]
+                  lines.append(f"- Shared booking target: href `{shared}` ({len(norms)} controls).")
+              else:
+                  widgetish = [item for item in norms if "booking.hospitable.com/" in item]
+                  keys = {widget_key(item) for item in widgetish}
+                  if widgetish and len(widgetish) == len(norms) and len(keys) == 1:
+                      shared = widgetish[0]
+                      lines.append(f"- Shared booking target: Hospitable URL `{widget_key(shared)}`.")
+                  else:
+                      failure = "Booking controls do not share one href or Hospitable URL: " + ", ".join(
+                          f"{label} -> {href or 'no href'}" for label, href in controls
+                      )
+                      failures.append(failure)
+                      lines.append(f"- {failure}")
+              discovered = widget_urls(html)
+              if not discovered and shared.endswith("/book"):
+                  book = request(shared if shared.startswith("http") else urljoin(APEX + "/", shared))
+                  if book.status == 200 and not is_challenge(book.headers, book.body):
+                      discovered = widget_urls(book.body)
+                      if discovered:
+                          lines.append("- Widget URL was taken from the shared /book document.")
+              if not discovered and shared and "booking.hospitable.com/widget/" in shared:
+                  discovered = [shared]
+              if not discovered:
+                  failure = "No Hospitable widget URL was found for the booking controls."
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+                  lines.append("")
+                  return
+              keys = {widget_key(url) for url in discovered}
+              if len(keys) != 1:
+                  failure = "More than one Hospitable widget URL was found: " + ", ".join(discovered)
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+                  lines.append("")
+                  return
+              widget = choose_widget(discovered)
+              lines.append(f"- Widget URL: `{widget}`")
+              fetched = request(widget, follow=True)
+              if fetched.error and fetched.status == 0:
+                  failure = f"Widget connection failure: {fetched.error}"
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+              elif is_challenge(fetched.headers, fetched.body):
+                  failure = f"Widget URL is a Cloudflare challenge page (HTTP {fetched.status})."
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+              elif fetched.status != 200:
+                  failure = f"Widget URL returned HTTP {fetched.status}, expected 200."
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+              else:
+                  title = page_title(fetched.body)
+                  lines.append(
+                      f"- Widget returned HTTP 200"
+                      + (f", title {title!r}" if title else "")
+                      + ". Not a Cloudflare challenge page."
+                  )
+              lines.append("")
+
+
+          def check_tracking(lines: list[str], failures: list[str], html: str) -> None:
+              lines.append("## Analytics")
+              lines.append("")
+              meta, ga, broken = tracking_report(html)
+              if meta:
+                  lines.append("- Meta Pixel: present (" + "; ".join(meta) + ").")
+              else:
+                  lines.append("- Meta Pixel: absent (no fbq, fbevents, or META_PIXEL_ID). This does not fail the job.")
+              if ga:
+                  lines.append("- GA4: present (" + "; ".join(ga) + ").")
+              else:
+                  lines.append("- GA4: absent (no gtag or G- measurement id). This does not fail the job.")
+              if broken:
+                  failure = "Script tag has an empty src: " + "; ".join(broken)
+                  failures.append(failure)
+                  lines.append(f"- {failure}")
+              else:
+                  lines.append("- No script tag with an empty src.")
+              lines.append("")
+
+
+          def check_hero(lines: list[str], failures: list[str], html: str) -> None:
+              lines.append("## Hero media")
+              lines.append("")
+              urls, note, root_only = hero_media_targets(html)
+              lines.append(f"- {note}")
+              for url in urls:
+                  summary, failure = check_media(url, root_only)
+                  lines.append(f"- {summary}")
+                  if failure:
+                      failures.append(f"Hero media: {failure}")
+              lines.append("")
+
+
+          def render(failures: list[str], sections: list[str]) -> str:
+              result = "fail" if failures else "pass"
+              header = [
+                  "# Weekly site health",
+                  "",
+                  f"Result: **{result}**",
+                  "",
+                  "Schedule: `0 14 * * 1` (Monday 14:00 UTC). GitHub Actions cron is UTC. "
+                  "That is 7:00 AM Mountain Standard Time (America/Denver in winter) and "
+                  "8:00 AM Mountain Daylight Time.",
+                  "",
+                  "This job only writes this step summary. It cannot post into the Cursor project chat.",
+                  "",
+              ]
+              if failures:
+                  header.extend(["## Failures", ""])
+                  header.extend(f"- {item}" for item in failures)
+                  header.append("")
+              return "\n".join(header + sections).rstrip() + "\n"
+
+
+          def write_summary(text: str) -> None:
+              path = os.environ.get("GITHUB_STEP_SUMMARY")
+              if path:
+                  with open(path, "a", encoding="utf-8") as handle:
+                      handle.write(text)
+                  print(text.splitlines()[2] if len(text.splitlines()) > 2 else "summary written")
+              else:
+                  print(text, end="")
+
+
+          def main() -> int:
+              sections: list[str] = []
+              failures: list[str] = []
+              apex: Fetch | None = None
+              try:
+                  apex = check_apex(sections, failures)
+                  check_www(sections, failures, apex)
+                  html = apex.body if apex and apex.body else ""
+                  if not html:
+                      failures.append("Booking, analytics, and hero checks did not run because the apex HTML was empty.")
+                      sections.extend(
+                          [
+                              "## Booking",
+                              "",
+                              "- Skipped because the apex HTML was empty.",
+                              "",
+                              "## Analytics",
+                              "",
+                              "- Skipped because the apex HTML was empty.",
+                              "",
+                              "## Hero media",
+                              "",
+                              "- Skipped because the apex HTML was empty.",
+                              "",
+                          ]
+                      )
+                  else:
+                      check_booking(sections, failures, html)
+                      check_tracking(sections, failures, html)
+                      check_hero(sections, failures, html)
+              except Exception as exc:
+                  failures.append(f"Health check stopped: {exc}")
+              write_summary(render(failures, sections))
+              return 1 if failures else 0
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          PY

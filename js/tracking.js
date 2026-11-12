@@ -1,13 +1,9 @@
 /*
  * Breckhaus Aframe — Meta Pixel + GA4 scaffold
  *
- * Oliver must edit the two placeholders below before anything is sent:
- *   META_PIXEL_ID        numeric Meta Pixel ID (Events Manager → Data sources)
- *   GA4_MEASUREMENT_ID   GA4 measurement ID (Admin → Data streams), format G-XXXXXXXX
- *
- * Confirm whether a GA4 property already exists before creating another one.
- * Leave these strings unchanged until the real IDs are ready. While they are
- * still the placeholders, this file does not request fbevents.js or gtag.js.
+ * META_PIXEL_ID is still the placeholder. fbevents.js is not requested until
+ * Oliver pastes the numeric Pixel ID from Events Manager.
+ * GA4_MEASUREMENT_ID is set. gtag.js loads for that property.
  *
  * Event choice (this site is one property page; booking is a request, not a charge):
  *   ViewContent          once per page that contains #property.
@@ -34,7 +30,7 @@
   if (window.BreckhausTracking && window.BreckhausTracking.installed) return;
 
   var META_PIXEL_ID = "META_PIXEL_ID";
-  var GA4_MEASUREMENT_ID = "GA4_MEASUREMENT_ID";
+  var GA4_MEASUREMENT_ID = "G-L4XM6LG9WK";
 
   var LISTING = {
     content_name: "Breckhaus Aframe",

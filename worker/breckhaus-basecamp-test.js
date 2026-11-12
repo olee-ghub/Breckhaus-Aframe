@@ -2409,6 +2409,25 @@ async function maybeRewriteHtml(request, env, res) {
     }
   }
 
+  // bh-area-add-hike-v1: append hike, sleigh, and tubing when the stored mosaic predates them.
+  if (!html.includes("bh-area-add-hike-v1")) {
+    var areaAddBtns = [
+      '<button data-slot="around-10-hiking" class="shot s4" type="button" data-full="img/area-hike-aspens.png?v=area7" data-cap="hiking"><img src="img/area-hike-aspens.png?v=area7" alt="Family hiking a ridge above fall aspens" width="333" height="220" loading="eager" decoding="async" /><span class="lbl">hiking</span></button>',
+      '<button data-slot="around-11-sleigh" class="shot s4" type="button" data-full="img/area-sleigh.jpg?v=area7" data-cap="horse-drawn sleigh"><img src="img/area-sleigh.jpg?v=area7" alt="Two horses pulling a red sleigh through the snow" width="877" height="658" loading="eager" decoding="async" /><span class="lbl">horse-drawn sleigh</span></button>',
+      '<button data-slot="around-12-tubing" class="shot s4" type="button" data-full="img/area-tubing.jpg?v=area7" data-cap="sledding hill"><img src="img/area-tubing.jpg?v=area7" alt="Two people tubing on a snowy hill above town" width="1024" height="683" loading="eager" decoding="async" /><span class="lbl">sledding hill</span></button>'
+    ];
+    var areaAddRe = /(<div class="mosaic bh-area-mosaic"[^>]*>)([\s\S]*?)(<\/div>)/i;
+    var areaAddMatch = html.match(areaAddRe);
+    if (areaAddMatch && areaAddMatch[2].indexOf("area-hike-aspens.png") < 0) {
+      html = html.replace(areaAddRe, areaAddMatch[1] + areaAddMatch[2] + areaAddBtns.join("") + areaAddMatch[3]);
+      changed = true;
+    }
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", "<!-- bh-area-add-hike-v1 -->" + "</head>");
+      changed = true;
+    }
+  }
+
 
 
   // bh-reviews-before-photos-v1: page order flyover, reviews, gallery;

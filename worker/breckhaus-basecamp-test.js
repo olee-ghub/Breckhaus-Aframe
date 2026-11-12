@@ -198,6 +198,7 @@ const AREA_SCULPTURE_BTN = "<button data-slot=\"around-06-snow-sculpture\" class
 const AREA_TROLL_BTN = "<button data-slot=\"around-07-troll\" class=\"shot s4\" type=\"button\" data-full=\"img/area-troll.jpg?v=area1\" data-cap=\"Isak Heartstone Breckenridge Troll\"><img src=\"img/area-troll.jpg?v=area1\" alt=\"Wooden troll sculpture in the forest near Breckenridge\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_CYCLISTS_BTN = "<button data-slot=\"around-08-cyclists\" class=\"shot s4\" type=\"button\" data-full=\"img/area-cyclists.jpg?v=area1\" data-cap=\"biking\"><img src=\"img/area-cyclists.jpg?v=area1\" alt=\"Four cyclists on a paved mountain trail\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /></button>";
 const AREA_R2_KEYS = new Set(["img/area-skier.jpg","img/area-snow-sculpture.jpg","img/area-troll.jpg","img/area-cyclists.jpg"]);
+const GALLERY_R2_KEYS = new Set(["img/bath-primary-robe.jpg","img/bath-public-goods.jpg","img/loft-stair-rail.jpg","img/area-hike-aspens.png","img/area-sleigh.jpg","img/area-tubing.jpg"]);
 function replaceBalancedOpenTag(html, openRe, replacement) {
   const m = openRe.exec(html);
   if (!m) return { html, changed: false };
@@ -674,7 +675,7 @@ async function maybeRewriteHtml(request, env, res) {
   // bh-area-around-v3: area mosaic 3-across; reset .s4 grid-column span
   if (!html.includes("bh-area-around-v3")) {
     var areaCss = "<style id=\"bh-area-around-v3\">/* Area activity mosaic: 3-across; reset .s4 span */.around .shot .lbl,.around .bh-area-mosaic .shot .lbl{display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;padding:1.4rem .7rem .55rem!important;background:linear-gradient(to top,rgba(13,13,11,.82),transparent)!important;font-size:.7rem!important;letter-spacing:.12em!important;text-transform:uppercase!important;color:var(--cream,#F2EDE4)!important;text-align:left!important;pointer-events:none!important;z-index:2!important;}.around .bh-area-mosaic{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;grid-auto-rows:auto!important;}@media (min-width:768px){.around .bh-area-mosaic{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}.around .bh-area-mosaic > .shot,.around .bh-area-mosaic > .shot.s4,.around .bh-area-mosaic > .shot.s6,.around .bh-area-mosaic > .shot.wide{position:relative!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;height:auto!important;min-height:0!important;max-width:none!important;aspect-ratio:3/2!important;align-self:stretch!important;}.around .bh-area-mosaic > .shot img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;object-fit:cover!important;}</style>";
-    var areaMosaic = "<div class=\"mosaic bh-area-mosaic\"><button data-slot=\"around-02-dog-sledding\" class=\"shot s4\" type=\"button\" data-full=\"img/around-dog-sledding.jpg?v=area6\" data-cap=\"Dog sledding\"><img src=\"img/around-dog-sledding.jpg?v=area6\" alt=\"Dog sled team running through the snow\" width=\"1439\" height=\"960\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Dog sledding</span></button><button data-slot=\"around-04-skiing\" class=\"shot s4\" type=\"button\" data-full=\"img/area-skier.jpg?v=area1\" data-cap=\"Skiing\"><img src=\"img/area-skier.jpg?v=area1\" alt=\"Skier carving powder above a mountain valley\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Skiing</span></button><button data-slot=\"around-09-snowboarding\" class=\"shot s4\" type=\"button\" data-full=\"img/around-ski-snowboard.jpg?v=bc1\" data-cap=\"Snowboarding\"><img src=\"img/around-ski-snowboard.jpg?v=bc1\" alt=\"Skier and snowboarder on an open snowy slope\" width=\"1440\" height=\"960\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Snowboarding</span></button><button data-slot=\"around-07-troll\" class=\"shot s4\" type=\"button\" data-full=\"img/area-troll.jpg?v=area1\" data-cap=\"Isak the troll\"><img src=\"img/area-troll.jpg?v=area1\" alt=\"Wooden troll sculpture in the forest near Breckenridge\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Isak the troll</span></button><button data-slot=\"around-08-cyclists\" class=\"shot s4\" type=\"button\" data-full=\"img/area-cyclists.jpg?v=area1\" data-cap=\"Biking\"><img src=\"img/area-cyclists.jpg?v=area1\" alt=\"Four cyclists on a paved mountain trail\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Biking</span></button><button data-slot=\"around-06-snow-sculpture\" class=\"shot s4\" type=\"button\" data-full=\"img/area-snow-sculpture.jpg?v=area1\" data-cap=\"Viking ice sculpture\"><img src=\"img/area-snow-sculpture.jpg?v=area1\" alt=\"Night snow sculpture of a horned figure with a dog\" width=\"720\" height=\"613\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Viking ice sculpture</span></button></div>";
+    var areaMosaic = "<div class=\"mosaic bh-area-mosaic\"><button data-slot=\"around-02-dog-sledding\" class=\"shot s4\" type=\"button\" data-full=\"img/around-dog-sledding.jpg?v=area6\" data-cap=\"Dog sledding\"><img src=\"img/around-dog-sledding.jpg?v=area6\" alt=\"Dog sled team running through the snow\" width=\"1439\" height=\"960\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Dog sledding</span></button><button data-slot=\"around-04-skiing\" class=\"shot s4\" type=\"button\" data-full=\"img/area-skier.jpg?v=area1\" data-cap=\"Skiing\"><img src=\"img/area-skier.jpg?v=area1\" alt=\"Skier carving powder above a mountain valley\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Skiing</span></button><button data-slot=\"around-09-snowboarding\" class=\"shot s4\" type=\"button\" data-full=\"img/around-ski-snowboard.jpg?v=bc1\" data-cap=\"Snowboarding\"><img src=\"img/around-ski-snowboard.jpg?v=bc1\" alt=\"Skier and snowboarder on an open snowy slope\" width=\"1440\" height=\"960\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Snowboarding</span></button><button data-slot=\"around-07-troll\" class=\"shot s4\" type=\"button\" data-full=\"img/area-troll.jpg?v=area1\" data-cap=\"Isak the troll\"><img src=\"img/area-troll.jpg?v=area1\" alt=\"Wooden troll sculpture in the forest near Breckenridge\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Isak the troll</span></button><button data-slot=\"around-08-cyclists\" class=\"shot s4\" type=\"button\" data-full=\"img/area-cyclists.jpg?v=area1\" data-cap=\"Biking\"><img src=\"img/area-cyclists.jpg?v=area1\" alt=\"Four cyclists on a paved mountain trail\" width=\"720\" height=\"479\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Biking</span></button><button data-slot=\"around-06-snow-sculpture\" class=\"shot s4\" type=\"button\" data-full=\"img/area-snow-sculpture.jpg?v=area1\" data-cap=\"Viking ice sculpture\"><img src=\"img/area-snow-sculpture.jpg?v=area1\" alt=\"Night snow sculpture of a horned figure with a dog\" width=\"720\" height=\"613\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">Viking ice sculpture</span></button><button data-slot=\"around-10-hiking\" class=\"shot s4\" type=\"button\" data-full=\"img/area-hike-aspens.png?v=area7\" data-cap=\"hiking\"><img src=\"img/area-hike-aspens.png?v=area7\" alt=\"Family hiking a ridge above fall aspens\" width=\"333\" height=\"220\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">hiking</span></button><button data-slot=\"around-11-sleigh\" class=\"shot s4\" type=\"button\" data-full=\"img/area-sleigh.jpg?v=area7\" data-cap=\"horse-drawn sleigh\"><img src=\"img/area-sleigh.jpg?v=area7\" alt=\"Two horses pulling a red sleigh through the snow\" width=\"877\" height=\"658\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">horse-drawn sleigh</span></button><button data-slot=\"around-12-tubing\" class=\"shot s4\" type=\"button\" data-full=\"img/area-tubing.jpg?v=area7\" data-cap=\"sledding hill\"><img src=\"img/area-tubing.jpg?v=area7\" alt=\"Two people tubing on a snowy hill above town\" width=\"1024\" height=\"683\" loading=\"eager\" decoding=\"async\" /><span class=\"lbl\">sledding hill</span></button></div>";
     if (html.includes("</head>")) {
       html = html.replace("</head>", areaCss + "</head>");
       changed = true;
@@ -1637,9 +1638,9 @@ async function maybeRewriteHtml(request, env, res) {
       if (!m) return;
       var btn = m[0];
       var next = btn;
-      var newCap = "Lower-level king bedside";
+      var newCap = "Lower level king en-suite";
       var newAlt = "Lower-level king suite with a brass dome lamp, wood nightstand, and an abstract print";
-      if (!/data-cap="Lower-level king bedside"/.test(next)) {
+      if (!/data-cap="Lower level king en-suite"/.test(next)) {
         next = next.replace(/data-cap="[^"]*"/, 'data-cap="' + newCap + '"');
       }
       if (next.indexOf('alt="' + newAlt + '"') === -1) {
@@ -2370,14 +2371,17 @@ async function maybeRewriteHtml(request, env, res) {
       "around-dog-sledding.jpg",
       "area-snow-sculpture.jpg",
       "area-troll.jpg",
-      "area-cyclists.jpg"
+      "area-cyclists.jpg",
+      "area-hike-aspens.png",
+      "area-sleigh.jpg",
+      "area-tubing.jpg"
     ];
     var mosaicRe = /(<div class="mosaic bh-area-mosaic"[^>]*>)([\s\S]*?)(<\/div>)/i;
     var mm = html.match(mosaicRe);
     if (mm) {
       var buttons = mm[2].match(/<button\b[\s\S]*?<\/button>/gi) || [];
       function mosaicKey(b) {
-        var m = b.match(/img\/([a-z0-9\-]+\.jpg)/i);
+        var m = b.match(/img\/([a-z0-9\-]+\.(?:jpg|png))/i);
         return m ? m[1].toLowerCase() : "";
       }
       var used = Object.create(null);
@@ -2401,6 +2405,25 @@ async function maybeRewriteHtml(request, env, res) {
     }
     if (html.includes("</head>")) {
       html = html.replace("</head>", "<!-- bh-area-mosaic-order-v1 -->" + "</head>");
+      changed = true;
+    }
+  }
+
+  // bh-area-add-hike-v1: append hike, sleigh, and tubing when the stored mosaic predates them.
+  if (!html.includes("bh-area-add-hike-v1")) {
+    var areaAddBtns = [
+      '<button data-slot="around-10-hiking" class="shot s4" type="button" data-full="img/area-hike-aspens.png?v=area7" data-cap="hiking"><img src="img/area-hike-aspens.png?v=area7" alt="Family hiking a ridge above fall aspens" width="333" height="220" loading="eager" decoding="async" /><span class="lbl">hiking</span></button>',
+      '<button data-slot="around-11-sleigh" class="shot s4" type="button" data-full="img/area-sleigh.jpg?v=area7" data-cap="horse-drawn sleigh"><img src="img/area-sleigh.jpg?v=area7" alt="Two horses pulling a red sleigh through the snow" width="877" height="658" loading="eager" decoding="async" /><span class="lbl">horse-drawn sleigh</span></button>',
+      '<button data-slot="around-12-tubing" class="shot s4" type="button" data-full="img/area-tubing.jpg?v=area7" data-cap="sledding hill"><img src="img/area-tubing.jpg?v=area7" alt="Two people tubing on a snowy hill above town" width="1024" height="683" loading="eager" decoding="async" /><span class="lbl">sledding hill</span></button>'
+    ];
+    var areaAddRe = /(<div class="mosaic bh-area-mosaic"[^>]*>)([\s\S]*?)(<\/div>)/i;
+    var areaAddMatch = html.match(areaAddRe);
+    if (areaAddMatch && areaAddMatch[2].indexOf("area-hike-aspens.png") < 0) {
+      html = html.replace(areaAddRe, areaAddMatch[1] + areaAddMatch[2] + areaAddBtns.join("") + areaAddMatch[3]);
+      changed = true;
+    }
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", "<!-- bh-area-add-hike-v1 -->" + "</head>");
       changed = true;
     }
   }
@@ -2621,6 +2644,144 @@ async function maybeRewriteHtml(request, env, res) {
     if (html !== before) changed = true;
   })();
 
+  // bh-gallery-cap-v282: bedroom, bath, and Around the home captions.
+  // Runs after v272–v277 so it wins over the older bedside caption.
+  // Ski / snowboard / dog-sled label font and color, scoped to these three groups.
+  (function () {
+    function fileOf(btn) {
+      var m = /data-full="([^"]+)"/.exec(btn) || /src="([^"]+)"/.exec(btn);
+      if (!m) return "";
+      var path = m[1].split("?")[0];
+      var i = path.lastIndexOf("img/");
+      return i >= 0 ? path.slice(i) : path;
+    }
+    function retargetFile(btn, file) {
+      var next = btn.replace(/data-full="[^"]*"/, 'data-full="' + file + '"');
+      if (/src="/.test(next)) next = next.replace(/src="[^"]*"/, 'src="' + file + '"');
+      return next;
+    }
+    function capOf(btn) {
+      var m = /data-cap="([^"]*)"/.exec(btn);
+      return m ? m[1] : "";
+    }
+    function withCap(btn, cap) {
+      var next = btn;
+      if (/data-cap="/.test(next)) next = next.replace(/data-cap="[^"]*"/, 'data-cap="' + cap + '"');
+      else next = next.replace(/<button\b/i, '<button data-cap="' + cap + '"');
+      if (/<span class="lbl">/.test(next)) next = next.replace(/(<span class="lbl">)[\s\S]*?(<\/span>)/, "$1" + cap + "$2");
+      else next = next.replace(/<\/button>\s*$/i, '<span class="lbl">' + cap + "</span></button>");
+      return next;
+    }
+    function buttonsOf(inner) {
+      var buttons = [];
+      var re = /<button\b[\s\S]*?<\/button>/gi;
+      var m;
+      while ((m = re.exec(inner))) buttons.push(m[0]);
+      return buttons;
+    }
+    function rewriteGroup(src, groupId, transformFn) {
+      var re = new RegExp('(<div[^>]*\\bid="' + groupId + '"[^>]*>[\\s\\S]*?<div class="gc-track"[^>]*>)([\\s\\S]*?)(</div>)', "i");
+      var m = src.match(re);
+      if (!m) return src;
+      var buttons = buttonsOf(m[2]);
+      var next = transformFn(buttons.slice());
+      if (!next) return src;
+      var inner = "\n          " + next.join("\n          ") + "\n          ";
+      var rebuilt = m[1] + inner + m[3];
+      if (rebuilt === m[0]) return src;
+      return src.replace(m[0], rebuilt);
+    }
+
+    var bedCaps = {
+      "img/bed-primary-bc58-1.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-2.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-3.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-4.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-5.jpg": "Primary King Suite",
+      "img/bed-primary-bc58-7.jpg": "Primary coffee station",
+      "img/king-barn-bc72.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-1.jpg": "Lower level king en-suite",
+      "img/bed-primary-bc58-8.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-2.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-4.jpg": "Lower level king en-suite",
+      "img/bed-king2-bc58-3.jpg": "Lower level king en-suite"
+    };
+    var robeSrc = "img/bath-primary-robe.jpg";
+    var robeBtn = '<button style="--ar:1600/1067" data-slot="gallery-bath-primary-robe" class="shot s6" type="button" data-full="' + robeSrc + '" data-cap="Primary king suite bath">\n            <img src="' + robeSrc + '" alt="Primary bath with a waffle robe and folded towels on the wall, a toilet to the left, and a glass shower to the right" loading="lazy" decoding="async" />\n          </button>';
+    var bathPlan = [
+      ["img/bath-primary-bc68.jpg", "Primary king suite bath"],
+      ["img/bath-primary-bc58-1.jpg", "Primary king suite bath"],
+      [robeSrc, "Primary king suite bath"],
+      ["img/bath-primary-bc58-3.jpg", "Primary king suite bath"],
+      ["img/bath-ensuite-bc68.jpg", "Lower level king en-suite"],
+      ["img/bath-double.jpg", "Lower level king en-suite"],
+      ["img/bath-hall-bc68.jpg", "Hallway bath"],
+      ["img/bath-public-goods.jpg", "Hallway bath"],
+      ["img/bath-hall-bc58-1.jpg", "Hallway bath"],
+      ["img/bath-hall-bc58-2.jpg", "Hallway bath"]
+    ];
+    var detailCaps = {
+      "img/entry-hall-bc58.jpg": "Entryway",
+      "img/laundry-bc58.jpg": "Laundry room",
+      "img/garage-gear-bc58.jpg": "Garage adventure wall"
+    };
+
+    var next = html;
+    next = rewriteGroup(next, "gallery-bedrooms", function (btns) {
+      return btns.map(function (b) {
+        var f = fileOf(b);
+        var cap = Object.prototype.hasOwnProperty.call(bedCaps, f) ? bedCaps[f] : capOf(b);
+        if (!cap) return b;
+        return withCap(b, cap);
+      });
+    });
+    next = rewriteGroup(next, "gallery-baths", function (btns) {
+      var byFile = Object.create(null);
+      btns.forEach(function (b) { byFile[fileOf(b)] = b; });
+      if (!byFile[robeSrc]) byFile[robeSrc] = robeBtn;
+      if (byFile["img/bath-ensuite-bc58-1.jpg"] && !byFile["img/bath-public-goods.jpg"]) {
+        byFile["img/bath-public-goods.jpg"] = retargetFile(byFile["img/bath-ensuite-bc58-1.jpg"], "img/bath-public-goods.jpg");
+      }
+      var used = Object.create(null);
+      var ordered = [];
+      bathPlan.forEach(function (row) {
+        var b = byFile[row[0]];
+        if (!b) return;
+        used[row[0]] = 1;
+        ordered.push(withCap(b, row[1]));
+      });
+      btns.forEach(function (b) {
+        var f = fileOf(b);
+        if (f === "img/bath-ensuite-bc58-1.jpg") return;
+        if (!used[f]) ordered.push(b);
+      });
+      return ordered;
+    });
+    next = rewriteGroup(next, "gallery-loft", function (btns) {
+      return btns.map(function (b) {
+        if (fileOf(b) !== "img/loft-west.jpg") return b;
+        return retargetFile(b, "img/loft-stair-rail.jpg");
+      });
+    });
+    next = rewriteGroup(next, "gallery-details", function (btns) {
+      return btns.filter(function (b) {
+        return fileOf(b) !== "img/details-hallway-bc58-1.jpg";
+      }).map(function (b) {
+        var f = fileOf(b);
+        if (!Object.prototype.hasOwnProperty.call(detailCaps, f)) return b;
+        return withCap(b, detailCaps[f]);
+      });
+    });
+    if (!next.includes('id="bh-gallery-cap-v282"') && next.includes("</head>")) {
+      var css = '<style id="bh-gallery-cap-v282">#gallery-bedrooms .shot .lbl,#gallery-baths .shot .lbl,#gallery-details .shot .lbl{display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;padding:1.4rem .7rem .55rem!important;background:linear-gradient(to top,rgba(13,13,11,.82),transparent)!important;font-size:.7rem!important;letter-spacing:.12em!important;text-transform:uppercase!important;color:var(--cream,#F2EDE4)!important;text-align:left!important;pointer-events:none!important;z-index:2!important}</style>';
+      next = next.replace("</head>", css + "</head>");
+    }
+    if (next !== html) {
+      html = next;
+      changed = true;
+    }
+  })();
+
   // bh-tracking-v1: serve GA4 from js/tracking.js. Meta Pixel ID stays the placeholder.
   if (isLiveHost(request) && !html.includes("bh-tracking-v1") && !html.includes("G-L4XM6LG9WK")) {
     var trackingTag = "<script id=\"bh-tracking-v1\">\n" + TRACKING_JS + "\n</script>";
@@ -2710,8 +2871,9 @@ var worker_default = {
 
     
     // Area mosaic images from R2
-    if (AREA_R2_KEYS.has(url.pathname.slice(1))) {
-      return serveR2Object(request, env, url.pathname.slice(1), "image/jpeg", "public, max-age=86400");
+    if (AREA_R2_KEYS.has(url.pathname.slice(1)) || GALLERY_R2_KEYS.has(url.pathname.slice(1))) {
+      var areaType = url.pathname.slice(1).endsWith(".png") ? "image/png" : "image/jpeg";
+      return serveR2Object(request, env, url.pathname.slice(1), areaType, "public, max-age=86400");
     }
     // Temp upload endpoint for area photos (test only)
     if (url.pathname === "/api/test-r2-put" && request.method === "POST") {
@@ -2719,7 +2881,7 @@ var worker_default = {
         const body = await request.json();
         const key = String(body.key || "");
         const b64 = String(body.b64 || "");
-        if (!AREA_R2_KEYS.has(key) || !b64) return new Response(JSON.stringify({ ok:false, error:"bad_key" }), { status:400, headers:{ "content-type":"application/json" } });
+        if ((!AREA_R2_KEYS.has(key) && !GALLERY_R2_KEYS.has(key)) || !b64) return new Response(JSON.stringify({ ok:false, error:"bad_key" }), { status:400, headers:{ "content-type":"application/json" } });
         const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
         await env.DRONE.put(key, bin, { httpMetadata: { contentType: "image/jpeg" } });
         return new Response(JSON.stringify({ ok:true, key, size: bin.length }), { status:200, headers:{ "content-type":"application/json" } });

@@ -3305,10 +3305,22 @@ body.has-book-bar footer { padding-bottom: 4.5rem; }
       var navMore = document.querySelector(".nav-more");
       if (navMore) {
         var closeNavMore = function () {
-          if (navMore.open) navMore.open = false;
+          if (navMore.open || navMore.hasAttribute("open")) {
+            navMore.open = false;
+            navMore.removeAttribute("open");
+          }
         };
         window.addEventListener("scroll", closeNavMore, { passive: true });
         window.addEventListener("touchmove", closeNavMore, { passive: true });
+        // Outside click/touch dismiss (pointerdown covers mouse + touch)
+        document.addEventListener("pointerdown", function (e) {
+          if (!navMore.open && !navMore.hasAttribute("open")) return;
+          if (navMore.contains(e.target)) return;
+          closeNavMore();
+        }, true);
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") closeNavMore();
+        });
       }
 
       function goTop() {
@@ -3798,16 +3810,17 @@ footer .foot-links{margin-bottom:1rem;row-gap:0}
   // card Guests row opens the same stepper (it now lives under the bar)
   gx.addEventListener('click',function(ev){if(ev.isTrusted&&gp.classList.contains('open')&&mq.matches)bar.scrollIntoView({block:'center',behavior:'smooth'});});
   document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){if(isOpen())close(1);else if(gp.classList.contains('open')){closeG();gb.focus();}}});
-  document.addEventListener('click',function(ev){var t=ev.target;
+  /* pointerdown covers mouse + touch; composedPath survives day-cell rebuild on pick (item79). */
+  document.addEventListener('pointerdown',function(ev){var t=ev.target;
     var path=(ev.composedPath&&ev.composedPath())||[];
-    var inPop=path.indexOf(pop)>=0||(t&&pop.contains(t));
-    var inDb=path.indexOf(db)>=0||(t&&db.contains(t));
-    var inGp=path.indexOf(gp)>=0||(t&&gp.contains(t));
-    var inGb=path.indexOf(gb)>=0||(t&&gb.contains(t));
-    var inGx=path.indexOf(gx)>=0||(t&&gx.contains(t));
-    /* item79: day cells are destroyed on pick; use composedPath so we don't treat the tap as outside. */
+    var inPop=path.indexOf(pop)>=0||(t&&pop.contains&&pop.contains(t));
+    var inDb=path.indexOf(db)>=0||(t&&db.contains&&db.contains(t));
+    var inGp=path.indexOf(gp)>=0||(t&&gp.contains&&gp.contains(t));
+    var inGb=path.indexOf(gb)>=0||(t&&gb.contains&&gb.contains(t));
+    var inGx=path.indexOf(gx)>=0||(t&&gx.contains&&gx.contains(t));
     if(isOpen()&&!inPop&&!inDb)close(0);
-    if(gp.classList.contains('open')&&!inGp&&!inGb&&!inGx)closeG();});
+    if(gp.classList.contains('open')&&!inGp&&!inGb&&!inGx)closeG();
+  },true);
   sync();
 })();
 </script>
@@ -4415,5 +4428,83 @@ dialog.bp81::backdrop{background:rgba(0,0,0,.65)}
 <!-- item83 2026-11-05: loft-looking-west + #area thumbs eager+dimensions (carousel/area blank/broken mitigation). No booking/Hospitable changes. -->
 
 <!-- item84+85+85b+86 2026-11-05: header Reserve; sticky removed; gallery ease; mobile parent close always visible -->
+<script id="bh-dropdown-outside-dismiss-v1">
+(function () {
+  function inEl(e, el) {
+    if (!el) return false;
+    try {
+      var p = e.composedPath && e.composedPath();
+      if (p && p.length) return p.indexOf(el) >= 0;
+    } catch (err) {}
+    var t = e.target;
+    return !!(t && (t === el || (el.contains && el.contains(t))));
+  }
+  function closeWx() {
+    var r = document.getElementById("bh-wx");
+    if (!r || !r.hasAttribute("open")) return;
+    r.removeAttribute("open");
+    var b = document.getElementById("bh-wx-trigger");
+    var p = document.getElementById("bh-wx-panel");
+    if (b) b.setAttribute("aria-expanded", "false");
+    if (p) p.hidden = true;
+  }
+  function closeEv() {
+    var r = document.getElementById("bh-ev");
+    if (!r || !r.hasAttribute("open")) return;
+    r.removeAttribute("open");
+    var b = document.getElementById("bh-ev-trigger");
+    var p = document.getElementById("bh-ev-panel");
+    if (b) b.setAttribute("aria-expanded", "false");
+    if (p) p.hidden = true;
+  }
+  function closeDetails(d) {
+    if (!d) return;
+    if (d.open || d.hasAttribute("open")) {
+      d.open = false;
+      d.removeAttribute("open");
+    }
+  }
+  function closeGuests() {
+    var gp = document.getElementById("bp67-gp");
+    if (!gp || !gp.classList.contains("open")) return;
+    gp.classList.remove("open");
+    var gx = document.getElementById("bp67-gx");
+    var gb = document.getElementById("bp69-guests");
+    if (gx) gx.setAttribute("aria-expanded", "false");
+    if (gb) gb.setAttribute("aria-expanded", "false");
+  }
+  function closeDates() {
+    var pop = document.getElementById("bp69-pop");
+    if (!pop || !pop.classList.contains("open")) return;
+    pop.classList.remove("open");
+    var scrim = document.querySelector(".bp69-scrim");
+    if (scrim) scrim.classList.remove("open");
+    document.documentElement.classList.remove("bp69-lock");
+    var db = document.getElementById("bp69-dates");
+    if (db) db.setAttribute("aria-expanded", "false");
+  }
+  function onOutside(e) {
+    var wx = document.getElementById("bh-wx");
+    var ev = document.getElementById("bh-ev");
+    var tmenu = document.getElementById("bh-tmenu");
+    var navMore = document.querySelector(".nav-more");
+    var gp = document.getElementById("bp67-gp");
+    var gx = document.getElementById("bp67-gx");
+    var gb = document.getElementById("bp69-guests");
+    var pop = document.getElementById("bp69-pop");
+    var db = document.getElementById("bp69-dates");
+    if (wx && wx.hasAttribute("open") && !inEl(e, wx)) closeWx();
+    if (ev && ev.hasAttribute("open") && !inEl(e, ev)) closeEv();
+    if (tmenu && !inEl(e, tmenu)) closeDetails(tmenu);
+    if (navMore && !inEl(e, navMore)) closeDetails(navMore);
+    document.querySelectorAll(".bh-mnav-house").forEach(function (h) {
+      if (!inEl(e, h)) closeDetails(h);
+    });
+    if (gp && gp.classList.contains("open") && !inEl(e, gp) && !inEl(e, gx) && !inEl(e, gb)) closeGuests();
+    if (pop && pop.classList.contains("open") && !inEl(e, pop) && !inEl(e, db)) closeDates();
+  }
+  document.addEventListener("pointerdown", onOutside, true);
+})();
+</script>
 </body>
 </html>

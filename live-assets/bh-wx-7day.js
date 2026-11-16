@@ -21,9 +21,27 @@
     if (c >= 95) return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 12h10a3.2 3.2 0 0 0 .2-6.4 4.3 4.3 0 0 0-8.2-1.4A3.5 3.5 0 0 0 7 12z"/><path fill="currentColor" d="M11.2 13.2h2.1l-1.5 3.1h1.5L10.8 21l1.1-4.2H10z"/></svg>';
     return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.2 17h10a3.6 3.6 0 0 0 .25-7.2 4.8 4.8 0 0 0-9.1-1.6A3.9 3.9 0 0 0 7.2 17z"/></svg>';
   }
+  function closeEvents() {
+    var ev = document.getElementById("bh-ev");
+    var evBtn = document.getElementById("bh-ev-trigger");
+    var evPanel = document.getElementById("bh-ev-panel");
+    if (!ev) return;
+    ev.removeAttribute("open");
+    if (evBtn) evBtn.setAttribute("aria-expanded", "false");
+    if (evPanel) evPanel.hidden = true;
+  }
   function setOpen(on) {
-    if (on) { root.setAttribute("open", ""); btn.setAttribute("aria-expanded", "true"); panel.hidden = false; panel.scrollTop = 0; }
-    else { root.removeAttribute("open"); btn.setAttribute("aria-expanded", "false"); panel.hidden = true; }
+    if (on) {
+      closeEvents();
+      root.setAttribute("open", "");
+      btn.setAttribute("aria-expanded", "true");
+      panel.hidden = false;
+      panel.scrollTop = 0;
+    } else {
+      root.removeAttribute("open");
+      btn.setAttribute("aria-expanded", "false");
+      panel.hidden = true;
+    }
   }
   btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setOpen(!root.hasAttribute("open")); });
   document.addEventListener("pointerdown", function (e) { if (!root.contains(e.target)) setOpen(false); }, true);
